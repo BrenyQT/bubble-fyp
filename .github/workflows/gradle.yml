@@ -26,15 +26,13 @@ jobs:
       with:
         gradle-version: '8.9'
 
-    - name: Change to Backend Directory
-      run: cd backend
-      
     - name: Grant Gradle Permissions
       run: chmod +x gradlew
+      working-directory: backend # Ensure this command runs in the backend directory
 
     - name: Build with Gradle Wrapper
       run: ./gradlew build
-      working-directory: backend # Ensure the command runs in the backend folder
+      working-directory: backend # Ensure this command runs in the backend directory
 
   dependency-submission:
     runs-on: ubuntu-latest
@@ -50,9 +48,6 @@ jobs:
         java-version: '23'
         distribution: 'temurin'
 
-    - name: Change to Backend Directory
-      run: cd backend
-
     - name: Generate and Submit Dependency Graph
       uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-      working-directory: backend # Ensure the command runs in the backend folder
+      working-directory: backend # Ensure this command runs in the backend directory
