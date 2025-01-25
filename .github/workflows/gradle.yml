@@ -23,10 +23,6 @@ jobs:
       run: ls
       working-directory: backend # Verify the backend directory structure
 
-    - name: Grant Execute Permissions for Gradle Wrapper
-      run: chmod +x gradlew
-      working-directory: backend
-
     - name: Build with Gradle Wrapper
       run: ./gradlew build
       working-directory: backend
