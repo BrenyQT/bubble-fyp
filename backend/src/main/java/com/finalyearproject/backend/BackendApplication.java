@@ -1,4 +1,4 @@
-package com.finalyearproject.bubble;
+package com.finalyearproject.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
