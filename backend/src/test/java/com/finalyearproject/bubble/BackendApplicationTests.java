@@ -1,4 +1,4 @@
-package com.finalyearproject.bubble;
+package com.finalyearproject.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
