@@ -21,13 +21,11 @@ jobs:
 
         distribution: 'temurin'
 
-    - name: Navigate to Backend Directory and List Files (Optional)
-      run: ls
-      working-directory: backend # Verify the backend directory structure
-
-    - name: Grant Execute Permissions for Gradle Wrapper
-      run: chmod +x gradlew
-      working-directory: backend
+    - name: Navigate to Backend Directory and Build
+      run: |
+        cd backend
+        chmod +x gradlew
+        ./gradlew build
 
 
     - name: Build with Gradle Wrapper
