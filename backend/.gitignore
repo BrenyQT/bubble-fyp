@@ -1,0 +1,27 @@
+# Build directories
+target/
+build/
+out/
+
+# Gradle files
+.gradle/
+.gradle-cache/
+*.jar
+*.war
+*.ear
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Spring Boot DevTools
+.spring-boot-devtools.properties
+
+# Database files
+*.db
+*.h2.db
+*.mv.db
+
+# Environment files
+.env
