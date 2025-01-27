@@ -1,4 +1,4 @@
-package com.finalyearproject.bubble.Services;
+package com.finalyearproject.bubble.Services.Authentication;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
