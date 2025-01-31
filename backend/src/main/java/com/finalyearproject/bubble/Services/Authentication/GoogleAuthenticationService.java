@@ -3,6 +3,7 @@ package com.finalyearproject.bubble.Services.Authentication;
 import com.finalyearproject.bubble.Entity.Authentication.oAuthUserDetails;
 import com.finalyearproject.bubble.Objects.Authentication.oAuthResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.net.URI;
@@ -15,7 +16,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.springframework.stereotype.Service;
+@Service
 public class GoogleAuthenticationService {
 
     // Google oAuth client ID (.env)
@@ -26,8 +28,7 @@ public class GoogleAuthenticationService {
 
     // Redirect URL once Google oAuth is successful
     private final String redirectUrl;
-
-
+    @Autowired
     public GoogleAuthenticationService(
             @Value("${GOOGLE_CLIENT_ID}") String clientId,
             @Value("${GOOGLE_CLIENT_SECRET}") String clientSecret,
@@ -131,8 +132,42 @@ public class GoogleAuthenticationService {
 
     }
 
-    public boolean checkIfUserAccessTokenIsExpired(String userID){
-        return false;
+    public oAuthResponse refreshAccessToken(String refreshToken) {
+        String refreshTokenUrl = "https://oauth2.googleapis.com/token";
+
+        try {
+            HttpClient httpClient = HttpClient.newHttpClient();
+
+            Map<String, String> params = Map.of(
+                    "client_id", clientId,
+                    "client_secret", clientSecret,
+                    "refresh_token", refreshToken,
+                    "grant_type", "refresh_token"
+            );
+
+            String requestBody = params.entrySet().stream()
+                    .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" +
+                            URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
+                    .collect(Collectors.joining("&"));
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(refreshTokenUrl))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                return objectMapper.readValue(response.body(), oAuthResponse.class);
+            } else {
+                throw new RuntimeException("Failed to refresh token. HTTP Status: " + response.statusCode());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error refreshing access token", e);
+        }
     }
+
 
 }

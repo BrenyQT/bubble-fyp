@@ -21,13 +21,19 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// Jpa Dependency
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
 	//Json Web Token Service
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+	//Postgres
+	implementation 'org.postgresql:postgresql:42.5.0'
+
 }
+
 
 tasks.named('test') {
 	useJUnitPlatform()
