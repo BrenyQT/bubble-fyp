@@ -1,38 +1,78 @@
 package com.finalyearproject.bubble.Objects.Authentication;
 
-    /*
-    When the User logs in via Google oAuth, the Google oAuth API provides a  short-lived Authorization code.
-    This Authorization code can be used to get :
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    access_token : Used to get Google Account information
-    refresh_token : Allows the User to gain a new access_token without requiring the User to log in again.
-     */
+public class oAuthResponse {
 
-    public class oAuthResponse {
-            private final String access_token;
-            private final String token_type;
-            private final Integer expires_in;
-            private final String scope;
-            private final String id_token;
-            private final String refresh_token;
+    private String accessToken;
+    private String tokenType;
+    private Integer expiresIn;
+    private String scope;
+    private String idToken;
+    private String refreshToken;
 
-            // Constructor
-            public oAuthResponse(String refresh_token, String access_token, String token_type, Integer expires_in, String scope, String id_token) {
-                this.refresh_token = refresh_token;
-                this.access_token = access_token;
-                this.token_type = token_type;
-                this.expires_in = expires_in;
-                this.scope = scope;
-                this.id_token = id_token;
-            }
-
-            // Getters  (Immutable)
-            public String getAccess_token() { return access_token; }
-            public String getToken_type() { return token_type; }
-            public Integer getExpires_in() { return expires_in; }
-            public String getScope() { return scope; }
-            public String getId_token() { return id_token; }
-            public String getRefresh_token() { return refresh_token; }
-
-
+    @JsonCreator
+    public oAuthResponse(
+            @JsonProperty("access_token") String accessToken,
+            @JsonProperty("token_type") String tokenType,
+            @JsonProperty("expires_in") Integer expiresIn,
+            @JsonProperty("scope") String scope,
+            @JsonProperty("id_token") String idToken,
+            @JsonProperty("refresh_token") String refreshToken) {
+        this.accessToken = accessToken;
+        this.tokenType = tokenType;
+        this.expiresIn = expiresIn;
+        this.scope = scope;
+        this.idToken = idToken;
+        this.refreshToken = refreshToken;
     }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getTokenType() {
+        return tokenType;
+    }
+
+    public Integer getExpiresIn() {
+        return expiresIn;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public String getIdToken() {
+        return idToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
+    }
+
+    public void setExpiresIn(Integer expiresIn) {
+        this.expiresIn = expiresIn;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    public void setIdToken(String idToken) {
+        this.idToken = idToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+}

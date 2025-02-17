@@ -31,6 +31,9 @@ dependencies {
 
 	//Postgres
 	implementation 'org.postgresql:postgresql:42.5.0'
+	//JWT
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 
 }
 

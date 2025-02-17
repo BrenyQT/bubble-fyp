@@ -2,172 +2,76 @@ package com.finalyearproject.bubble.Services.Authentication;
 
 import com.finalyearproject.bubble.Entity.Authentication.oAuthUserDetails;
 import com.finalyearproject.bubble.Objects.Authentication.oAuthResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
-
+import org.springframework.stereotype.Service;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
 @Service
 public class GoogleAuthenticationService {
 
-    // Google oAuth client ID (.env)
     private final String clientId;
-
-    // Google oAuth client Secret (.env)
     private final String clientSecret;
+    private final String redirectUri;
+    private final HttpClient httpClient;
 
-    // Redirect URL once Google oAuth is successful
-    private final String redirectUrl;
-    @Autowired
     public GoogleAuthenticationService(
             @Value("${GOOGLE_CLIENT_ID}") String clientId,
             @Value("${GOOGLE_CLIENT_SECRET}") String clientSecret,
-            @Value("${OAUTH_SUCCESS_REDIRECT_URL}") String redirectUrl)
-             {
-                 this.clientId = clientId;
-                 this.clientSecret = clientSecret;
-                 this.redirectUrl = redirectUrl;
-             }
-
-
-    /*
-    When User successfully completes Google oAuth login we get the Authentication Code.
-    We pass this Authentication Code to the token endpoint of the Google oAuth API.
-
-    RETURNS : ACCESS TOKEN.
-    USE : ACCESS TOKEN IS USED TO GET USER ACCOUNT INFORMATION.
-     */
-    public oAuthResponse exchangeAuthenticationCodeForAccessToken(String authenticationCode) {
-
-
-        String authenticationCodeExchangeUrl = "https://oauth2.googleapis.com/token";
-
-        try {
-            // Create the HTTP client to handle request
-            HttpClient httpClient = HttpClient.newHttpClient();
-
-            // Prepare request body as a form-urlencoded string
-            Map<String, String> params = Map.of(
-                    "code", authenticationCode,
-                    "redirect_uri", redirectUrl,
-                    "client_id", clientId,
-                    "client_secret", clientSecret,
-                    "grant_type", "authorization_code"
-            );
-
-            // Distinguish KEY = VALUE and split each using &.
-            String requestBody = params.entrySet().stream()
-                    .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" +
-                            URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
-                    .collect(Collectors.joining("&"));
-
-            // Build the HTTP request to get the Access Token
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(authenticationCodeExchangeUrl))
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                    .build();
-
-            // Send HTTP request
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            // Response of 200 indicates success
-            if (response.statusCode() == 200) {
-                // Map the response body into oAuthResponse
-                ObjectMapper objectMapper = new ObjectMapper();
-                return objectMapper.readValue(response.body(), oAuthResponse.class);
-            } else {
-                throw new RuntimeException("Failed to exchange code. HTTP Status: " + response.statusCode());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error during token exchange", e);
-        }
+            @Value("${OAUTH_SUCCESS_REDIRECT_URL}") String redirectUri) {
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.redirectUri = redirectUri;
+        this.httpClient = HttpClient.newHttpClient();
     }
 
-    /*
-    Using the Users Access token we can query the oAuth API and return the fields associated with the users account.
+    public String exchangeCodeForAccessToken(String authCode) throws Exception {
+        String tokenUrl = "https://oauth2.googleapis.com/token";
 
-    RETURNS : All details about a Users account.
-    USE : We use this information to populate the accounts when they are created.
-     */
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("code", authCode);
+        parameters.put("client_id", clientId);
+        parameters.put("client_secret", clientSecret);
+        parameters.put("redirect_uri", redirectUri);
+        parameters.put("grant_type", "authorization_code");
 
-    public oAuthUserDetails getoAuthUserDetailsFromAccessToken(String accessToken) {
-        String userInfoExchangeURL = "https://www.googleapis.com/oauth2/v2/userinfo";
+        String requestBody = parameters.entrySet().stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .collect(Collectors.joining("&"));
 
-        try {
-            // Create an HTTP client to handle request.
-            HttpClient httpClient = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(tokenUrl))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
 
-            // Build the GET request with Authorization header
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(userInfoExchangeURL))
-                    .header("Authorization", "Bearer " + accessToken)
-                    .GET()
-                    .build();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            // Send the request and get the response
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> responseMap = objectMapper.readValue(response.body(), Map.class);
 
-            // Response of 200 indicates success
-            if (response.statusCode() == 200) {
-                // Map the response body to the oAuthUserDetails object
-                ObjectMapper objectMapper = new ObjectMapper();
-                return objectMapper.readValue(response.body(), oAuthUserDetails.class);
-            } else {
-                throw new RuntimeException("Failed to retrieve user profile. HTTP Status: " + response.statusCode());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error retrieving user profile details from Google", e);
-        }
-
+        return (String) responseMap.get("access_token");
     }
 
-    public oAuthResponse refreshAccessToken(String refreshToken) {
-        String refreshTokenUrl = "https://oauth2.googleapis.com/token";
+    public oAuthUserDetails fetchUserProfile(String accessToken) throws Exception {
+        String userInfoUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
 
-        try {
-            HttpClient httpClient = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(userInfoUrl + "?access_token=" + accessToken))
+                .header("Authorization", "Bearer " + accessToken)
+                .GET()
+                .build();
 
-            Map<String, String> params = Map.of(
-                    "client_id", clientId,
-                    "client_secret", clientSecret,
-                    "refresh_token", refreshToken,
-                    "grant_type", "refresh_token"
-            );
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            String requestBody = params.entrySet().stream()
-                    .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" +
-                            URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
-                    .collect(Collectors.joining("&"));
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(refreshTokenUrl))
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                return objectMapper.readValue(response.body(), oAuthResponse.class);
-            } else {
-                throw new RuntimeException("Failed to refresh token. HTTP Status: " + response.statusCode());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error refreshing access token", e);
-        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(response.body(), oAuthUserDetails.class);
     }
-
-
 }
