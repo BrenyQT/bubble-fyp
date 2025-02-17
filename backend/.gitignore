@@ -3,13 +3,6 @@ target/
 build/
 out/
 
-# Gradle files
-.gradle/
-.gradle-cache/
-*.jar
-*.war
-*.ear
-
 # Logs
 logs/
 *.log
