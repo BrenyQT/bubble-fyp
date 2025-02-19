@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/authentication/**", "/public/**").permitAll()
-                        .requestMatchers("/Workspace").authenticated() // AUTHENTICATED
+                        .requestMatchers("/Workspace" , "/user").authenticated() // AUTHENTICATED
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(new JsonWebTokenFilter(jsonWebTokenService), UsernamePasswordAuthenticationFilter.class);

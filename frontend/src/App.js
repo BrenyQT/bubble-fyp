@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Authentication/Home";
-import Workspace from "./pages/Workspace";
+import Workspace from "./pages/Workspaces/Workspace";
 import News from "./pages/Authentication/News.js"
 import About from "./pages/Authentication/About"
 function App() {
