@@ -1,7 +1,6 @@
 package com.finalyearproject.bubble.Services.Authentication;
 
 import com.finalyearproject.bubble.Entity.Authentication.oAuthUserDetails;
-import com.finalyearproject.bubble.Objects.Authentication.oAuthResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -9,7 +8,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,6 +20,7 @@ public class GoogleAuthenticationService {
     private final String redirectUri;
     private final HttpClient httpClient;
 
+    // Constructor with Loaded in secrets
     public GoogleAuthenticationService(
             @Value("${GOOGLE_CLIENT_ID}") String clientId,
             @Value("${GOOGLE_CLIENT_SECRET}") String clientSecret,
@@ -32,7 +31,16 @@ public class GoogleAuthenticationService {
         this.httpClient = HttpClient.newHttpClient();
     }
 
+    /*
+     When Grant code is given as a param from redirect we want to use it to get the access token
+
+     Creates a Map for request body
+     URL encoded string Format
+
+     Get access token from response
+     */
     public String exchangeCodeForAccessToken(String authCode) throws Exception {
+        // Static Google URL
         String tokenUrl = "https://oauth2.googleapis.com/token";
 
         Map<String, String> parameters = new HashMap<>();
@@ -60,12 +68,17 @@ public class GoogleAuthenticationService {
         return (String) responseMap.get("access_token");
     }
 
+    /*
+    Update URL to include access token
+    Returns oAUthUser Object
+    */
     public oAuthUserDetails fetchUserProfile(String accessToken) throws Exception {
+        // Static Google URL
         String userInfoUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(userInfoUrl + "?access_token=" + accessToken))
-                .header("Authorization", "Bearer " + accessToken)
+                .header("Authorization", "Bearer " + accessToken) // TO:DO : JWT HERE ??
                 .GET()
                 .build();
 

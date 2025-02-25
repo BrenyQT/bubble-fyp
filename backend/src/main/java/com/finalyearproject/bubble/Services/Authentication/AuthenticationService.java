@@ -20,15 +20,17 @@ public class AuthenticationService {
     }
 
     public oAuthUserDetails authenticateUser(String authCode) throws Exception {
-        //Exchange auth code for access token
+
+        // Exchange Grant Code for Access
         String accessToken = googleAuthenticationService.exchangeCodeForAccessToken(authCode);
 
-        //Fetch Google user profile
+        // Get the Users details
         oAuthUserDetails googleUser = googleAuthenticationService.fetchUserProfile(accessToken);
 
-        //Check if user exists, update or create new
+        // Query, Create or Update User Row
         Optional<oAuthUserDetails> existingUser = userDetailsRepository.findById(googleUser.getId());
 
+        // Updating the existing user fields
         if (existingUser.isPresent()) {
             oAuthUserDetails user = existingUser.get();
             user.setName(googleUser.getName());
@@ -39,6 +41,7 @@ public class AuthenticationService {
             user.setPicture(googleUser.getPicture());
             return userDetailsRepository.save(user);
         } else {
+            // Save the orignal account without chnages
             return userDetailsRepository.save(googleUser);
         }
     }

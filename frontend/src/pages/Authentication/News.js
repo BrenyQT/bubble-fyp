@@ -1,6 +1,8 @@
 import React from "react";
 import Navbar from "../../components/Navbar";
 
+// Filler page
+// TO:DO fix the content
 const News = () => {
     return (
         <div className="bg-secondary min-h-screen text-white">
