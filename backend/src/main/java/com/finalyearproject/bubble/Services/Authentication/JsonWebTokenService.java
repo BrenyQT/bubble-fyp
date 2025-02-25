@@ -1,6 +1,5 @@
 package com.finalyearproject.bubble.Services.Authentication;
 
-import com.finalyearproject.bubble.Entity.Authentication.oAuthUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +13,7 @@ public class JsonWebTokenService {
     private final SecretKey secretKey;
     private final long expirationTime;
 
+    // Constructor (Load in Secrets)
     public JsonWebTokenService(
             @Value("${JWT_SECRET}") String jwtSecret,
             @Value("${JWT_EXPIRATION_MS}") long expirationTime) {
@@ -21,6 +21,7 @@ public class JsonWebTokenService {
         this.expirationTime = expirationTime;
     }
 
+    // Create a new JWT using user email
     public String generateToken(String userEmail) {
         return Jwts.builder()
                 .setSubject(userEmail)
@@ -30,6 +31,7 @@ public class JsonWebTokenService {
                 .compact();
     }
 
+    // Parses a JWT checks signature and claims
     public Claims validateToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
@@ -37,11 +39,12 @@ public class JsonWebTokenService {
                 .parseClaimsJws(token)
                 .getBody();
     }
-    public String extractEmail(String jwtToken) {
+    // Parses a JWT and extracts user email from subject body
+    public String extractEmail(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
-                .parseClaimsJws(jwtToken)
+                .parseClaimsJws(token)
                 .getBody();
 
         return claims.getSubject();
