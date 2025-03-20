@@ -1,5 +1,6 @@
 package com.finalyearproject.bubble.Entity.Workspaces;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalyearproject.bubble.Entity.Authentication.oAuthUserDetails;
 import jakarta.persistence.*;
 
@@ -12,6 +13,7 @@ specified the db name
 */
 @Entity
 @Table(name = "workspaces")
+
 public class Workspaces {
 
     @Id // Primary key  starts at 1 and ++

@@ -1,5 +1,6 @@
 package com.finalyearproject.bubble.Entity.Authentication;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
@@ -9,6 +10,7 @@ specified the db name
 */
 @Entity
 @Table(name = "oauth_user_details")
+
 public class oAuthUserDetails {
 
     @Id // Primary Key (unique and value)
