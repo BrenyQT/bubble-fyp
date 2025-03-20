@@ -112,7 +112,6 @@ const WorkspaceChat = () => {
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
-
     return (
         <div className="bg-secondary min-h-screen flex flex-col">
             <Navbar user={user} />
@@ -129,22 +128,31 @@ const WorkspaceChat = () => {
 
             <div className="flex flex-col items-center w-full">
                 <h1 className="text-white text-2xl font-bold mb-2">{workspace.name} Chat</h1>
-                <!-- outer box  -->
-                <div className="w-full max-w-6xl bg-opacity-30 bg-white backdrop-blur-lg p-5 rounded-lg border border-white/50 shadow-lg">
-                    <!-- Scrollbar/Window -->
-                    <div className="max-h-[500px] overflow-y-auto rounded-lg p-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent border border-white/20 bg-opacity-10 bg-gray-900">
-                        <!-- if messages exist in workspace map over them and create constants of each of there datas -->
 
+                {/* Outer chat container */}
+                <div className="w-full max-w-6xl bg-opacity-30 bg-white backdrop-blur-lg p-5 rounded-lg border border-white/50 shadow-lg">
+
+                    {/* Scrollable chat window */}
+                    <div className="max-h-[500px] overflow-y-auto rounded-lg p-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent border border-white/20 bg-opacity-10 bg-gray-900">
+
+                        {/* If messages exist in workspace, map over them and create constants for each message */}
                         {messages.length > 0 ? (
                             messages.map((msg, index) => {
                                 const timestamp = msg.timestamp ? new Date(msg.timestamp) : null;
                                 const formattedTime = timestamp ? format(timestamp, "hh:mm a") : "Unknown Time";
                                 const formattedDate = timestamp ? format(timestamp, "MMM d, yyyy") : "Unknown Date";
-                                <!-- Return each as a card-->
-                                <!-- TO:DO Maybe make this into a prop -->
+
+                                {/* Render each message as a card */}
+                                {/* TO DO: Consider making this into a reusable component */}
                                 return (
-                                    <div key={index} className={`flex items-start p-3 mb-2 rounded-lg max-w-[75%] ${msg.sender?.email === user.email ? "bg-blue-500 text-white ml-auto" : "bg-gray-700 text-white"} shadow-md`}>
-                                        <img src={msg.sender?.picture || "public/default-profile.png"} alt={msg.sender?.name || "user"} className="w-8 h-8 rounded-full mr-3 border border-white/30" />
+                                    <div key={index} className={`flex items-start p-3 mb-2 rounded-lg max-w-[75%] 
+                                    ${msg.sender?.email === user.email ? "bg-blue-500 text-white ml-auto" : "bg-gray-700 text-white"} shadow-md`}
+                                    >
+                                        <img
+                                            src={msg.sender?.picture || "/default-profile.png"}
+                                            alt={msg.sender?.name || "user"}
+                                            className="w-8 h-8 rounded-full mr-3 border border-white/30"
+                                        />
                                         <div>
                                             <div className="flex items-center">
                                                 <strong className="text-white">{msg.sender?.name || "Unknown User"}</strong>
@@ -158,19 +166,33 @@ const WorkspaceChat = () => {
                         ) : (
                             <p className="text-white text-center">No messages yet.</p>
                         )}
-                        <!-- This helps me scroll to the newest message using a ref  -->
+
+                        {/* This helps auto-scroll to the newest message using a ref */}
                         <div ref={messagesEndRef}></div>
                     </div>
 
+                    {/* Input field and send button */}
                     <div className="mt-4 flex">
-                        <!-- Handles message input -->
-                        <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} className="flex-1 p-3 rounded-lg text-black shadow-md border border-white/30" placeholder="Type a message..." />
-                        <button onClick={sendMessage} className="ml-3 bg-primary text-white px-5 py-3 rounded-lg shadow-md">Send</button>
+                        {/* Handles message input */}
+                        <input
+                            type="text"
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            className="flex-1 p-3 rounded-lg text-black shadow-md border border-white/30"
+                            placeholder="Type a message..."
+                        />
+                        <button
+                            onClick={sendMessage}
+                            className="ml-3 bg-primary text-white px-5 py-3 rounded-lg shadow-md"
+                        >
+                            Send
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     );
+
 };
 
 export default WorkspaceChat;
