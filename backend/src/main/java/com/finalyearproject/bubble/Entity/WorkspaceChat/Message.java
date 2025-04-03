@@ -16,11 +16,11 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne(fetch = FetchType.EAGER) // Many Messages to a sender IDS
+    @ManyToOne(fetch = FetchType.EAGER) // Many Messages to a user
     @JoinColumn(name = "sender_id", nullable = false)
     private oAuthUserDetails sender;
 
-    @ManyToOne(fetch = FetchType.EAGER)// Many Messages to a Workspace IDS
+    @ManyToOne(fetch = FetchType.EAGER) // Many Messages to a workspace
     @JoinColumn(name = "workspace_id", nullable = false)
     private Workspaces workspace;
 
@@ -50,4 +50,3 @@ public class Message {
     public void setContent(String content) { this.content = content; }
     public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
 }
-

@@ -1,47 +1,54 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.4.2'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.4.2'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.finalyearproject'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(23) // Ensure Java 23 is supported by your build tools
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(23) // Ensure Java 23 is supported by your build tools
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	// Spring Boot Web (for REST APIs & WebSockets)
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+    // PostgreSQL
+    implementation 'org.postgresql:postgresql:42.5.0'
 
-	// WebSockets & STOMP Support
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	// Spring Boot Testing
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    //TO:DO Fix the JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JSON PARSER
 
-	// Spring Boot JPA (database)
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-	// JSON Web Token (JWT) Authentication
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    // Spring Boot Web (for REST APIs & WebSockets)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	// PostgreSQL
-	implementation 'org.postgresql:postgresql:42.5.0'
+    // WebSockets & STOMP Support
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
-	// Spring Security
-	//TO:DO Fix the JWT
-	implementation 'org.springframework.boot:spring-boot-starter-security'
+    // Spring Boot Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Spring Boot JPA (database)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // JSON Web Token (JWT) Authentication
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+
+
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

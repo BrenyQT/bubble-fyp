@@ -13,6 +13,7 @@ const ViewWorkspace = () => {
     // Pass user email into function to retrieve all users workspaces
     useEffect(() => {
         if (user) {
+
             fetchWorkspaces(user.email);
         }
     }, [user]);
@@ -30,20 +31,20 @@ const ViewWorkspace = () => {
 
     // Redirects to chat of the Workspace thats clicked on
     const handleWorkspaceClick = (workspace) => {
-        navigate(`/workspaceChat/${workspace.id}`, { state: { workspace, user } });
+        navigate(`/workspaceDashboard/${workspace.id}`, { state: { workspace, user } });
     };
 
     return (
-        <div className="bg-secondary min-h-screen flex flex-col">
+        <div className="bg-secondary min-h-screen flex flex-col pt-12">
             <Navbar user={user} className="fixed top-0 left-0 w-full z-50" />
 
-            <div className="mt-[80px] w-full max-w-6xl mx-auto py-5">
+            <div className="bg-secondary px-6 pt-6 mt-6">
                 <button
-                    onClick={() => navigate("/Workspace")}
-                    className="flex items-center text-white px-1 py-1 bg-primary rounded-lg shadow-md hover:bg-opacity-80 transition duration-200 text-lg font-semibold"
+                    onClick={() => navigate("/Workspace", { state: { user } })}
+                    className="flex items-center text-white bg-primary px-4 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition"
                 >
-                    <ArrowLeft size={24} className="mr-2" />
-                    Back to Workspaces
+                    <ArrowLeft size={20} className="mr-2" />
+                    Return to Workspace View
                 </button>
             </div>
 
