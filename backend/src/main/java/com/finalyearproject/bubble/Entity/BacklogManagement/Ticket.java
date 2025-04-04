@@ -42,7 +42,7 @@ public class Ticket {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sprint_id")
-    private Sprint sprint; // Spriny which ticket is apart of
+    private Sprint sprint; // Sprint which ticket is apart of
 
     private Date createdAt; // the moment ticket is created
 

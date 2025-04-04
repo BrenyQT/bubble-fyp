@@ -1,6 +1,7 @@
 package com.finalyearproject.bubble.Controller.SprintBacklog;
 
 import com.finalyearproject.bubble.Entity.Authentication.oAuthUserDetails;
+import com.finalyearproject.bubble.Entity.BacklogManagement.Ticket;
 import com.finalyearproject.bubble.Entity.SprintBacklog.Sprint;
 import com.finalyearproject.bubble.Entity.Workspaces.Workspaces;
 import com.finalyearproject.bubble.Repository.Authentication.oAuthUserDetailsRepository;
@@ -53,17 +54,27 @@ public class SprintController {
     public Sprint createNewSprint(@RequestBody Sprint sprint, @PathVariable("workspaceId") int workspaceId) {
         System.out.println("Creating new sprint");
 
-        Workspaces makeSureWorkspaceCreated = workspaceRepository.findById(workspaceId).orElse(null); // i couldnt parse the object so i only pass th id
-        oAuthUserDetails makeSureCreatedBy = userRepository.findById(sprint.getCreatedBy().getId()).orElse(null);
+        // Ensure workspace exists
+        Workspaces workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new IllegalArgumentException("Workspace not found"));
 
-        // not in db
-        if (makeSureWorkspaceCreated == null || makeSureCreatedBy == null) {
-            throw new IllegalArgumentException("user or workspace abd !!");
-        }
+        // Ensure user exists
+        oAuthUserDetails createdBy = userRepository.findById(sprint.getCreatedBy().getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        sprint.setWorkspace(makeSureWorkspaceCreated);
-        sprint.setCreatedBy(makeSureCreatedBy);
+        // Get the next ticket number in this workspace
+        int nextTicketNumber = sprintRepository.findByWorkspace(workspace)
+                .stream()
+                .mapToInt(Sprint::getSprintNumber)
+                .max()
+                .orElse(0) + 1;
+
+        // Set relationships and ticket number
+        sprint.setWorkspace(workspace);
+        sprint.setCreatedBy(createdBy);
+        sprint.setSprintNumber(nextTicketNumber);  // assuming Sprint has this field
 
         return sprintRepository.save(sprint);
     }
+
 }

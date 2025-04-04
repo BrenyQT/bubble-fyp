@@ -27,6 +27,9 @@ public class Sprint {
     @JoinColumn(name = "created_by")
     private oAuthUserDetails createdBy; // sets the user who created
 
+    @Column(name = "sprint_number")
+    private int sprintNumber; // the workspace-scoped ticket number
+
     @ManyToOne
     @JoinColumn(name = "workspace_id")
     private Workspaces workspace; // sets the workspace of creation
@@ -38,16 +41,26 @@ public class Sprint {
         this.current = false;  // Default value
     }
 
-    public Sprint(String name, String goal, boolean completed, boolean current, Workspaces workspace, oAuthUserDetails createdBy) {
+    public Sprint(String name, String goal, boolean completed, boolean current, Workspaces workspace, oAuthUserDetails createdBy, int sprintNumber) {
         this.name = name;
         this.goal = goal;
         this.completed = completed;
         this.current = current;
         this.workspace = workspace;
         this.createdBy = createdBy;
+        this.sprintNumber = sprintNumber;
     }
 
     // Getters and Setters
+
+    public int getSprintNumber() {
+        return sprintNumber;
+    }
+
+    public void setSprintNumber(int sprintNumber) {
+        this.sprintNumber = sprintNumber;
+    }
+
     public int getId() { return id; }
 
     public String getName() { return name; }
