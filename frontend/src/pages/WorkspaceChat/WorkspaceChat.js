@@ -32,6 +32,8 @@ const WorkspaceChat = () => {
     const [selectedLang, setSelectedLang] = useState("en");
     const messagesEndRef = useRef(null); // used for flow transition when opening chat
     const stompClientRef = useRef(null); // reate a reference to a websocket connection
+    const selectedLangRef = useRef(selectedLang); // GONNA HAVE TO SOTRE THE LANGAUGE
+
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -44,8 +46,13 @@ const WorkspaceChat = () => {
         DE: "de",
         ES: "es",
         IT: "it",
-        HU: "hu"
+        HU: "hu",
+        PL: "pl"
     };
+
+    useEffect(() => {
+        selectedLangRef.current = selectedLang;
+    }, [selectedLang]);
 
     useEffect(() => {
         if (!workspace || !user) {
@@ -70,9 +77,13 @@ const WorkspaceChat = () => {
             onConnect: () => {
                 client.subscribe(`/topic/${workspace.id}`, async (message) => {
                     const receivedMessage = JSON.parse(message.body);
-                    const translated = await translateMessage(receivedMessage.content);
-                    setMessages(prev => [...prev, receivedMessage]);
-                    setTranslatedMessages(prev => [...prev, translated]);
+
+                    // Translate the received message based on the current language
+                    const translated = await translateMessage(receivedMessage.content, selectedLangRef.current);
+
+                    // Add the received message to the messages state and update translated messages
+                    setMessages((prev) => [...prev, receivedMessage]);
+                    setTranslatedMessages((prev) => [...prev, translated]);
                 });
             },
             onStompError: (frame) => console.error("WebSocket Error:", frame),
@@ -81,24 +92,26 @@ const WorkspaceChat = () => {
         client.activate();
         stompClientRef.current = client;
 
-        // When closing the chat page the WebSocket connection is closed
+        // When closing the chat page, the WebSocket connection is closed
         return () => {
             if (client) client.deactivate();
         };
     };
+
+
 
     //  Fetch the messages sent from the past in a particular group
     const fetchMessages = () => {
         fetch(`http://localhost:8080/messages?workspaceId=${workspace.id}`, {
             method: "GET",
             credentials: "include",
-            headers: {"Accept": "application/json"}, // wasnt fetching idk why this works
+            headers: { "Accept": "application/json" }, // wasnt fetching idk why this works
         })
             .then(response => response.json())
             .then(async data => {
                 setMessages(Array.isArray(data) ? data : []); // non empty array
                 const translated = await Promise.all( //make sure all send
-                    data.map(msg => translateMessage(msg.content)) // translate all the messages
+                    data.map(msg => translateMessage(msg.content, selectedLang)) // translate all the messages
                 );
                 setTranslatedMessages(translated);
             })
@@ -147,9 +160,9 @@ const WorkspaceChat = () => {
 
         //create Message Payload
         const payload = {
-            sender: {id: user.id},
+            sender: { id: user.id },
             content: newMessage,
-            workspace: {id: workspace.id},
+            workspace: { id: workspace.id },
         };
 
         stompClientRef.current.publish({
@@ -159,6 +172,7 @@ const WorkspaceChat = () => {
 
         setNewMessage("");
     };
+
     // set the new language and translate all messages
     const handleLangChange = async (countryCode) => {
         const lang = languageMap[countryCode];
@@ -195,7 +209,7 @@ const WorkspaceChat = () => {
 
 
     return (
-        <div className="bg-secondary min-h-screen flex flex-col">
+        <div className="bg-secondary min-h-screen flex flex-col h-screen">
             <Navbar user={user} workspace={workspace}/>
 
             <div className="mt-[80px] w-full px-6 flex justify-between items-center">
@@ -214,14 +228,15 @@ const WorkspaceChat = () => {
                 <div className="bg-primary text-primary rounded-lg hover:bg-opacity-90 transition flex items-center">
                     <ReactFlagsSelect
                         className="bg-primary rounded-lg"
-                        countries={["GB", "FR", "DE", "ES", "IT", "HU"]}
+                        countries={["GB", "FR", "DE", "ES", "IT", "HU", "PL"]}
                         customLabels={{
                             GB: "English",
                             FR: "Français",
                             DE: "Deutsch",
                             ES: "Español",
                             IT: "Italiano",
-                            HU: "Magyar"
+                            HU: "Magyar",
+                            PL: "Polska"
                         }}
                         selected={Object.keys(languageMap).find(key => languageMap[key] === selectedLang)}
                         onSelect={handleLangChange}
@@ -235,8 +250,9 @@ const WorkspaceChat = () => {
 
             {/* Chat window */}
             <div
-                className="w-full max-h-[500px] overflow-y-auto rounded-lg p-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent border border-white/20 bg-opacity-10 bg- mt-4">
-                {messages.length > 0 ? (
+                className="flex-1 overflow-y-auto rounded-lg p-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent border border-white/20 bg-opacity-10 bg-primary mt-4">
+
+            {messages.length > 0 ? (
                     messages.map((msg, index) => {
                         const timestamp = msg.timestamp ? new Date(msg.timestamp) : null;
                         const formattedTime = timestamp ? format(timestamp, "hh:mm a") : "Unknown Time";
@@ -257,7 +273,7 @@ const WorkspaceChat = () => {
                                     <div className="flex items-center">
                                         <strong className="text-white">{msg.senderName || "Unknown User"}</strong>
                                         <span
-                                            className="ml-2 text-sm text-gray-300">{formattedTime} • {formattedDate}</span>
+                                            className="ml-2 text-sm text-white">{formattedTime} • {formattedDate}</span>
                                     </div>
                                     <p className="text-white">
                                         {translatedMessages[index] || msg.content || "No content"}

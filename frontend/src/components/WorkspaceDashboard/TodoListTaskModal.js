@@ -34,10 +34,10 @@ const TodoListTaskModal = ({ isOpen, onClose, newTask, setNewTask, onSave }) => 
                 <h2 className="text-xl font-semibold mb-4 text-white">New Task</h2>
                 <input
                     type="text"
-                    value={newTask}
-                    onChange={(e) => setNewTask(e.target.value)}
+                    value={newTask} // link it to the parent components state
+                    onChange={(e) => setNewTask(e.target.value)} // update the state when i type
                     className="w-full p-2 border border-gray-300 rounded-lg mb-4"
-                    placeholder="Enter task..."
+                    placeholder=" Enter task..."
                 />
                 <button
                     onClick={onSave}

@@ -17,10 +17,6 @@ const SprintList = () => {
     const [selectedSprint, setSelectedSprint] = useState(null);  // State to store selected sprint
     const [isCreateSprintModalOpen, setIsCreateSprintModalOpen] = useState(false);  // State for Create Sprint Modal
 
-
-
-
-
     useEffect(() => {
         if (user && workspace) {
             fetchSprints(workspace.id);
@@ -33,7 +29,13 @@ const SprintList = () => {
             credentials: "include",
         })
             .then(response => response.json()) // turn json obj into sprints
-            .then(data => setSprints(data))
+            .then(data => {
+                const mappedSprints = data.map(s => ({
+                    ...s,
+                    active: s.current // map backend's 'current' to frontend's expected 'active'
+                }));
+                setSprints(mappedSprints);
+            })
             .catch(error => console.error("cant get sprints ", error));
     };
 
@@ -91,30 +93,35 @@ const SprintList = () => {
 
                 <div className="w-full max-w-6xl px-4 py-8">
                     <div className="max-h-[500px] overflow-y-auto rounded-lg border border-white/30 bg-opacity-20 bg-white backdrop-blur-lg p-4 shadow-lg scrollbar-thin scrollbar-thumb-[rgba(255,255,255,0.3)] scrollbar-track-transparent">
-                        {sprints.length > 0 ? ( // TO:DOthis still seems to work but maybe check Array.isArray()
-                            sprints.map((sprint) => (
+                        {/* this is dirty i gotta make backend endpoint */}
+                        { sprints
+                            .filter(sprint => !sprint.completed)
+                            .map((sprint) => (
                                 <div
-                                    key={sprint.id}
+                                    key={sprint.sprintNumber}
                                     className="flex items-center justify-between bg-primary text-white p-5 rounded-lg shadow-md mb-4 transition duration-200 hover:border-accent border-2 border-transparent w-full cursor-pointer"
-                                    onClick={() => setSelectedSprint(sprint)} // Set selected sprint on click
+                                    onClick={() => setSelectedSprint(sprint)}
                                 >
                                     <div className="flex flex-col space-y-1">
                                         <div className="flex justify-between items-center mb-2">
                                             <h3 className="text-lg font-semibold text-white">{sprint.name}</h3>
-                                            <span className="text-xs text-white bg-accent px-2 py-1 rounded">{`#${sprint.id}`}</span>
+                                            <span className="text-xs text-white bg-accent px-2 py-1 rounded">{`#${sprint.sprintNumber}`}</span>
                                         </div>
                                         <h2 className="text-base">{sprint.goal}</h2>
                                         {sprint.active && (
-                                            <span className="text-xs bg-green-600 text-white px-2 py-1 mt-1 rounded">
-                                                Active
-                                            </span>
+                                            <span className="text-xs max-w-12 bg-green-600 text-white px-2 py-1 mt-1 rounded">
+                        Active
+                    </span>
                                         )}
                                     </div>
                                 </div>
                             ))
-                        ) : (
+                        }
+                        {/* this is dirty i gotta make backend endpoint */}
+                        { sprints.filter(sprint => !sprint.completed).length === 0 && (
                             <p className="text-white text-center">No sprints found.</p>
                         )}
+
                     </div>
                 </div>
             </div>
@@ -128,6 +135,7 @@ const SprintList = () => {
                     user={user}
                     workspace={workspace}
                     onSetCurrent={handleSetCurrentSprint} // Set current sprint if selected
+                    onSprintDeleted={fetchSprints} // when i dlete a sprint i want the list to refresh
                 />
             )}
 

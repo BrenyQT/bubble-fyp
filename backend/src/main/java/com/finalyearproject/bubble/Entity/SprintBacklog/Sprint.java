@@ -1,5 +1,7 @@
 package com.finalyearproject.bubble.Entity.SprintBacklog;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalyearproject.bubble.Entity.BacklogManagement.Ticket;
 import com.finalyearproject.bubble.Entity.Authentication.oAuthUserDetails;
 import com.finalyearproject.bubble.Entity.Workspaces.Workspaces;
@@ -9,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "sprints")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})  // Added to avoid serialization issues with lazy loading
 public class Sprint {
 
     @Id
@@ -35,7 +38,8 @@ public class Sprint {
     private Workspaces workspace; // sets the workspace of creation
 
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL)
-    private List<Ticket> tickets; // lsit of tickets
+    @JsonManagedReference // idk why but it keppt looking for a sprint in a sprint when i was doing the sprint pages so this stops infinite recursion
+    private List<Ticket> tickets; // list of tickets
 
     public Sprint() {
         this.current = false;  // Default value
@@ -52,44 +56,22 @@ public class Sprint {
     }
 
     // Getters and Setters
-
-    public int getSprintNumber() {
-        return sprintNumber;
-    }
-
-    public void setSprintNumber(int sprintNumber) {
-        this.sprintNumber = sprintNumber;
-    }
-
+    public int getSprintNumber() { return sprintNumber; }
+    public void setSprintNumber(int sprintNumber) { this.sprintNumber = sprintNumber; }
     public int getId() { return id; }
-
     public String getName() { return name; }
-
     public String getGoal() { return goal; }
-
     public boolean isCompleted() { return completed; }
-
     public boolean isCurrent() { return current; }
-
     public Workspaces getWorkspace() { return workspace; }
-
     public oAuthUserDetails getCreatedBy() { return createdBy; }
-
     public List<Ticket> getTickets() { return tickets; }
-
     public void setId(int id) { this.id = id; }
-
     public void setName(String name) { this.name = name; }
-
     public void setGoal(String goal) { this.goal = goal; }
-
     public void setCompleted(boolean completed) { this.completed = completed; }
-
     public void setCurrent(boolean current) { this.current = current; }
-
     public void setWorkspace(Workspaces workspace) { this.workspace = workspace; }
-
     public void setCreatedBy(oAuthUserDetails createdBy) { this.createdBy = createdBy; }
-
     public void setTickets(List<Ticket> tickets) { this.tickets = tickets; }
 }
