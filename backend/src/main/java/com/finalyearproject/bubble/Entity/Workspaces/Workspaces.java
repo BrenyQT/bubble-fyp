@@ -18,7 +18,7 @@ public class Workspaces {
     @Column(columnDefinition = "TEXT")
     private String image;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false, length = 100)
@@ -57,5 +57,9 @@ public class Workspaces {
         if (!this.users.contains(user)) {
             this.users.add(user);
         }
+    }
+    // removing
+    public void removeUser(oAuthUserDetails user) {
+        this.users.remove(user);
     }
 }

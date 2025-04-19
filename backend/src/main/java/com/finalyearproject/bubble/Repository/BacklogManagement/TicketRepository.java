@@ -17,6 +17,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     List<Ticket> findByCreatedBy_Id(String userId);
 
+    List<Ticket> findByWorkspace_Id(int workspaceId);
 
     List<Ticket> findByWorkspace(Workspaces workspace);
 

@@ -4,7 +4,6 @@ import {X} from "lucide-react";  // Import close icon
 const CreateSprintModal = ({user, workspace, onSprintCreated, onClose}) => {
     const [sprintName, setSprintName] = useState("");  // Sprint name state
     const [goal, setGoal] = useState("");  // Sprint goal state
-    const [status, setStatus] = useState("");  // Sprint status state
 
     // Sprint create form submisson handler
     const handleCreateSprintFormSubmission = async (e) => {

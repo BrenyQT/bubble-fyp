@@ -16,4 +16,6 @@ public interface WorkspacesRepository extends JpaRepository<Workspaces, Integer>
 
     Optional<Workspaces> findByCode(String code);
 
+    //  find a workspace by its id
+    Optional<Workspaces> findById(Long id);
 }

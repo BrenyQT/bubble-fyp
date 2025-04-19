@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/Navbar/Navbar";
 import { ArrowLeft } from "lucide-react";
 import SprintKanbanModal from "../../components/SprintBacklog/SprintKanbanBoard"; // Import the Kanban modal
 import CreateSprintModal from "../../components/SprintBacklog/CreateSprintModal";
-import format from "date-fns/format"; // Import the Create Sprint modal
 
 const SprintList = () => {
     const location = useLocation();
@@ -13,7 +12,7 @@ const SprintList = () => {
     const user = location.state?.user;
     const workspace = location.state?.workspace;
     const [sprints, setSprints] = useState([]);
-    const [isKanbanModalOpen, setIsKanbanModalOpen] = useState(false);  // Modal state
+    const [, setIsKanbanModalOpen] = useState(false);  // Modal state
     const [selectedSprint, setSelectedSprint] = useState(null);  // State to store selected sprint
     const [isCreateSprintModalOpen, setIsCreateSprintModalOpen] = useState(false);  // State for Create Sprint Modal
 
@@ -99,14 +98,17 @@ const SprintList = () => {
                             .map((sprint) => (
                                 <div
                                     key={sprint.sprintNumber}
-                                    className="flex items-center justify-between bg-primary text-white p-5 rounded-lg shadow-md mb-4 transition duration-200 hover:border-accent border-2 border-transparent w-full cursor-pointer"
+                                    className="relative flex items-center bg-primary text-white p-5 rounded-lg shadow-md mb-4 transition duration-200 hover:border-accent border-2 border-transparent w-full cursor-pointer"
                                     onClick={() => setSelectedSprint(sprint)}
                                 >
+                                    {/* FINAL TO:DO make this to the top right */}
+                                    <span className="absolute top-2 right-2 text-xs text-white bg-accent px-2 py-1 rounded">
+                                    #{sprint.sprintNumber}
+                                     </span>
+
+                                    {/* Main content */}
                                     <div className="flex flex-col space-y-1">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <h3 className="text-lg font-semibold text-white">{sprint.name}</h3>
-                                            <span className="text-xs text-white bg-accent px-2 py-1 rounded">{`#${sprint.sprintNumber}`}</span>
-                                        </div>
+                                        <h3 className="text-lg font-semibold text-white">{sprint.name}</h3>
                                         <h2 className="text-base">{sprint.goal}</h2>
                                         {sprint.active && (
                                             <span className="text-xs max-w-12 bg-green-600 text-white px-2 py-1 mt-1 rounded">
@@ -117,6 +119,7 @@ const SprintList = () => {
                                 </div>
                             ))
                         }
+
                         {/* this is dirty i gotta make backend endpoint */}
                         { sprints.filter(sprint => !sprint.completed).length === 0 && (
                             <p className="text-white text-center">No sprints found.</p>

@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {useNavigate, useLocation} from "react-router-dom";
 import {DndProvider, useDrag, useDrop} from "react-dnd"; // Kanban board and ticket
 import {HTML5Backend} from "react-dnd-html5-backend"; // Native drag and drop support
 import {ArrowLeft} from "lucide-react"; // Back button icon
 import ShowTicketModal from "../../components/BacklogManagement/ShowTicketModal";
-import Navbar from "../../components/Navbar"; // Modal for ticket details
+import Navbar from "../../components/Navbar/Navbar"; // Modal for ticket details
 
 
 const COLUMN_NAMES = ["Backlog", "In Progress", "In Review", "Done"]; // Task statuses
@@ -64,7 +64,7 @@ const Column = ({name, tasks, moveTask, onTicketClick}) => {
     //
     return (
         // assigns drop functionality to the div
-        <div ref={drop} className="w-64 bg-gray-800 p-4 rounded-lg shadow-md">
+        <div ref={drop} className="w-64 bg-accent p-4 rounded-lg shadow-md">
             <h2 className="text-white font-bold text-lg mb-3">{name}</h2>
             <div className="space-y-3">
                 {tasks.map((task) => (
@@ -119,7 +119,10 @@ const KanbanBoard = () => {
 
 
     // gets all the tickets within a current sprint in a workspace
-    const fetchTasks = () => {
+    // was getting errors with multiple calls
+    // doesnt get recalled unless workspace id chnages
+    // seems to have fixed my warning
+    const fetchTasks = useCallback(() => {
         fetch(`http://localhost:8080/sprints/getCurrentSprintTickets/${workspace.id}`)
             .then((res) => res.json())
             .then((data) => {
@@ -137,15 +140,17 @@ const KanbanBoard = () => {
                     setTasks(listOfTasks);
                 }
             })
-            .catch((err) => console.error(",cant load the tickets" ,  err));
-    };
+            .catch((err) => console.error(",cant load the tickets", err));
+    }, [workspace?.id]);
+
 
     // fetch tasks when page opens
     useEffect(() => {
         if (workspace?.id) {
             fetchTasks();
         }
-    }, [workspace]);
+    }, [workspace?.id, fetchTasks]);
+
 
     // safety net to return to home
     if (!workspace || !user) {

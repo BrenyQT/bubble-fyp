@@ -13,6 +13,9 @@ public interface SprintRepository extends JpaRepository<Sprint, Integer> {
     // Find all sprints for a workspace
     List<Sprint> findByWorkspace(Workspaces workspace);
 
+    //Find sprints list from workpsace Id
+    List<Sprint> findByWorkspace_Id(int workspace);
+
     // Find completed sprints by workspace id
     //Update this to maybe take object
     List<Sprint> findCompletedByWorkspaceId(int id);

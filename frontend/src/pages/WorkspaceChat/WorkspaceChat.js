@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/Navbar/Navbar";
 import {ArrowLeft} from "lucide-react";
 import format from "date-fns/format";
 import {Client} from "@stomp/stompjs";
@@ -29,7 +29,7 @@ const WorkspaceChat = () => {
     const [messages, setMessages] = useState([]); // state which loads messages in a workpsace chat
     const [newMessage, setNewMessage] = useState(""); // new message for text bar
     const [translatedMessages, setTranslatedMessages] = useState([]); // secound array to store messages when translated
-    const [selectedLang, setSelectedLang] = useState("en");
+    const [selectedLang, setSelectedLang] = useState("en"); // set default to enlgish
     const messagesEndRef = useRef(null); // used for flow transition when opening chat
     const stompClientRef = useRef(null); // reate a reference to a websocket connection
     const selectedLangRef = useRef(selectedLang); // GONNA HAVE TO SOTRE THE LANGAUGE
@@ -47,7 +47,8 @@ const WorkspaceChat = () => {
         ES: "es",
         IT: "it",
         HU: "hu",
-        PL: "pl"
+        PL: "pl",
+        BG: "bg"
     };
 
     useEffect(() => {
@@ -126,12 +127,13 @@ const WorkspaceChat = () => {
                 params: {
                     q: text,
                     target: lang,
-                    key: "AIzaSyBg6crFqzluJpprAPmVbcVHokPs2ResoAI", // remove this :DDDDD
+                    key: "AIzaSyBg6crFqzluJpprAPmVbcVHokPs2ResoAI",
+
                 },
             });
 
 
-            // Congrats Brendan it was worth the headache
+            // Congrats Brendan it was worth the headache, but i left this ^
             const translated = response?.data?.data?.translations?.[0]?.translatedText;
             /*
                                  {
@@ -228,7 +230,7 @@ const WorkspaceChat = () => {
                 <div className="bg-primary text-primary rounded-lg hover:bg-opacity-90 transition flex items-center">
                     <ReactFlagsSelect
                         className="bg-primary rounded-lg"
-                        countries={["GB", "FR", "DE", "ES", "IT", "HU", "PL"]}
+                        countries={["GB", "FR", "DE", "ES", "IT", "HU", "PL", "BG"]}
                         customLabels={{
                             GB: "English",
                             FR: "Français",
@@ -236,7 +238,9 @@ const WorkspaceChat = () => {
                             ES: "Español",
                             IT: "Italiano",
                             HU: "Magyar",
-                            PL: "Polska"
+                            PL: "Polska",
+                            BG: "Bŭlgarski"
+
                         }}
                         selected={Object.keys(languageMap).find(key => languageMap[key] === selectedLang)}
                         onSelect={handleLangChange}
@@ -265,7 +269,7 @@ const WorkspaceChat = () => {
                             <div key={index} className={`flex items-start p-3 mb-2 rounded-lg max-w-[75%] 
                 ${isCurrentUser ? "bg-accent text-white ml-auto" : "bg-primary text-white"} shadow-md`}>
                                 <img
-                                    src={msg.senderPicture || "/default-profile.png"}
+                                    src={msg.senderPicture}
                                     alt={msg.senderName || "user"}
                                     className="w-8 h-8 rounded-full mr-3 border border-white/30"
                                 />
@@ -273,7 +277,7 @@ const WorkspaceChat = () => {
                                     <div className="flex items-center">
                                         <strong className="text-white">{msg.senderName || "Unknown User"}</strong>
                                         <span
-                                            className="ml-2 text-sm text-white">{formattedTime} • {formattedDate}</span>
+                                            className="ml-2 text-sm text-white">{formattedTime} - {formattedDate}</span>
                                     </div>
                                     <p className="text-white">
                                         {translatedMessages[index] || msg.content || "No content"}

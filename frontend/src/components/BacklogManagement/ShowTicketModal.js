@@ -157,7 +157,7 @@ const ShowTicketModal = ({ ticket, onClose, user, onTicketUpdated }) => {
                                         </button>
                                     )
                                 ) : (
-                                    <p className="text-xs text-gray-500">This ticket is completed, can't modify assignee.</p>
+                                    <p className="text-xs text-white">This ticket is completed, can't modify assignee.</p>
                                 )
                             )}
                         </div>
@@ -184,7 +184,7 @@ const ShowTicketModal = ({ ticket, onClose, user, onTicketUpdated }) => {
 
                         <div>
                             <p className="text-xs text-white uppercase font-bold mb-1">Created</p>
-                            <p className="text-white">{formattedTime} • {formattedDate}</p>
+                            <p className="text-white">{formattedTime} - {formattedDate}</p>
                         </div>
 
                         <div className="pt-4">
@@ -199,7 +199,7 @@ const ShowTicketModal = ({ ticket, onClose, user, onTicketUpdated }) => {
                                     Delete Ticket
                                 </button>
                             ) : (
-                                <p className="text-xs text-gray-500">This ticket is completed cannot delete.</p>
+                                <p className="text-xs text-white">This ticket is completed cannot delete.</p>
                             )}
                         </div>
                     </div>

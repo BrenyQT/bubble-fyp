@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from "react";
-import {DndProvider, useDrag, useDrop} from "react-dnd";
-import {HTML5Backend} from "react-dnd-html5-backend";
-import {X} from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { X } from "lucide-react";
 import ManageSprintTicketsModal from "./ManageSprintTicketsModal";
 import ShowTicketModal from "../BacklogManagement/ShowTicketModal";
 
@@ -30,7 +30,6 @@ const KanbanBoardTask = ({task, onClick}) => {
             className={`relative p-3 bg-white text-black rounded-lg shadow-md border border-gray-300 cursor-pointer ${isDragging ? "opacity-50" : ""} ${highPriorityClass}`}
         >
             {/* show the picture if user is assigned  */}
-
             {task.assignedTo?.picture && (
                 <img
                     src={task.assignedTo.picture}
@@ -55,7 +54,7 @@ const Column = ({name, tasks, moveTask, onTicketClick}) => {
     // TO;DO I NEED TO MAKE THIS USE THE KANBAN BOARD TASK COMPONENT
     return (
         // assigns drop functionality to the div
-        <div ref={drop} className="w-64 bg-gray-800 p-4 rounded-lg shadow-md">
+        <div ref={drop} className="w-64 bg-accent p-4 rounded-lg shadow-md">
             <h2 className="text-white font-bold text-lg mb-3">{name}</h2>
             <div className="space-y-3">
                 {/* for some reason i have to check tasks is array idk man */}
@@ -95,7 +94,7 @@ const SprintKanbanModal = ({isOpen, onClose, sprint, user, workspace, onSetCurre
                     if (Array.isArray(data)) {
                         setTasks(data); // update the tasks state to the list of tickets
                     }
-                })
+                });
         }
     }, [sprint, workspace]);
 
@@ -177,13 +176,12 @@ const SprintKanbanModal = ({isOpen, onClose, sprint, user, workspace, onSetCurre
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div
-                className="bg-secondary max-w-6xl w-full rounded-xl shadow-lg p-6 relative max-h-[90vh] overflow-y-auto">
+            <div className="bg-secondary max-w-6xl w-full rounded-xl shadow-lg p-6 relative max-h-[90vh] overflow-y-auto">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-white hover:text-red-500"
                 >
-                    <X size={24}/>
+                    <X size={24} />
                 </button>
 
                 <div className="flex justify-between items-center m-4 mb-6">
@@ -255,7 +253,7 @@ const SprintKanbanModal = ({isOpen, onClose, sprint, user, workspace, onSetCurre
                         setShowTicketModal(false); // swap them
                     }}
                 />
-        ``
+
                 {/* show selected ticket modal */}
                 <ShowTicketModal
                     ticket={selectedTicket}

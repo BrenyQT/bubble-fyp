@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from "react";
 import {useLocation, useNavigate} from "react-router-dom"; // Pass in user and workspace
 import {ArrowLeft} from "lucide-react"; // return button
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/Navbar/Navbar";
 import CreateTicketModal from "../../components/BacklogManagement/CreateTicketModal"; // Create a new ticket
 import ShowTicketModal from "../../components/BacklogManagement/ShowTicketModal";   // when a ticket is clicked on
 import FilterModal from "../../components/BacklogManagement/FilterModal"; // Filter
@@ -143,7 +143,7 @@ const BacklogPage = () => {
                                 <p className="text-sm text-white">{ticket.description}</p>
                                 <p className="text-white mt-1">Type: {ticket.label || "Unknown"}</p>
                                 <p className="text-xs text-white">
-                                    Created: {formattedTime} • {formattedDate}
+                                    Created: {formattedTime} - {formattedDate}
                                 </p>
                             </div>
                         );

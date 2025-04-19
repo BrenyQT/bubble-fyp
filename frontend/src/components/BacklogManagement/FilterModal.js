@@ -36,7 +36,7 @@ const FilterModal = ({onClose, onApply, currentFilter}) => {
                         onApply("");
                         onClose();
                     }}
-                            className="hover:bg-accent text-white bg-primary px-4 py-2 bg-accent text-gray-700 rounded hover:bg-accnt">Reset
+                            className="hover:bg-accent text-white bg-primary px-4 py-2 bg-accent text-white rounded hover:bg-accnt">Reset
                     </button>
                     <div className="space-x-2">
                         {/*Pass back selected filter  */}

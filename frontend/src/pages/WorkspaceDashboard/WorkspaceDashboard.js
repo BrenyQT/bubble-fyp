@@ -1,10 +1,13 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate, useLocation} from "react-router-dom";
-import Navbar from "../../components/Navbar";
-import Modal from "react-modal";
+import Navbar from "../../components/Navbar/Navbar";
 import {Trash2, ArrowLeft, ArrowRight} from "lucide-react";
 import TodoListTaskModal from "../../components/WorkspaceDashboard/TodoListTaskModal";
 import DashboardCard from "../../components/WorkspaceDashboard/DashBoardCard";
+import CreateAnnouncementModal from "../../components/WorkspaceDashboard/CreateAnnouncementModal";
+import ShowAnnouncementModal from "../../components/WorkspaceDashboard/ShowAnnouncementModal";
+import { useCallback } from "react"; // temp this might fix the problem
+
 
 
 // TO:DO tidy this up and make more readable
@@ -20,18 +23,17 @@ const WorkspaceDashboard = () => {
     const [newTask, setNewTask] = useState(""); // capture the new task when added
     const [isModalOpen, setIsModalOpen] = useState(false); // state for add task modal
 
+    const [announcements, setAnnouncements] = useState([]);
+    const [newAnnouncement, setNewAnnouncement] = useState("");
+    const [isAnnouncementModalOpen, setIsAnnouncementModalOpen] = useState(false);
 
-    // safety check
-    // i think i can make this safer
-    useEffect(() => {
-        if (workspace && user) {
-            fetchTasks();
-        }
-    }, [workspace, user]);
+    const [selectedAnnouncementId, setSelectedAnnouncementId] = useState(null);
 
 
     // retrieve a user's tasks
-    const fetchTasks = async () => {
+    // Kept refrendering so i have to add use callback
+    // i think this is ok ?
+    const fetchTasks = useCallback(async () => {
         try {
             const response = await fetch(`http://localhost:8080/todo/${user.id}/${workspace.id}`);
             const data = await response.json();
@@ -39,7 +41,25 @@ const WorkspaceDashboard = () => {
         } catch (error) {
             console.error("fetch tasks error :", error);
         }
-    };
+    }, [user, workspace]);
+    // feth this way instead
+    const fetchAnnouncements = useCallback(async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/getAnnouncements/${workspace.id}`);
+            const data = await response.json();
+            setAnnouncements(data);
+        } catch (error) {
+            console.error("fetch announcements error:", error);
+        }
+    }, [workspace]);
+
+    useEffect(() => {
+        if (workspace && user) {
+            fetchTasks();
+            fetchAnnouncements();
+        }
+    }, [workspace, user, fetchTasks, fetchAnnouncements]);
+
 
 
     // add a new To do task for a user in a workpsace
@@ -69,6 +89,7 @@ const WorkspaceDashboard = () => {
             console.error("couldnt add task /addTask", error);
         }
     };
+
 
 
     // Change task.completed in backend which helps update my frontend css
@@ -103,6 +124,35 @@ const WorkspaceDashboard = () => {
         navigate("/viewWorkspace");
         return null; // kept rerendering ??
     }
+
+
+    const addAnnouncement = async () => {
+        if (!newAnnouncement.trim()) return; // safety net
+
+        const payload = {
+            content: newAnnouncement,
+            workspaceId: workspace.id,
+            authorId: user.id,
+        };
+
+        try {
+
+            const response = await fetch("http://localhost:8080/addAnnouncements", {
+                method: "POST",
+                body: JSON.stringify(payload),
+            });
+
+            if (response.ok) {
+                setNewAnnouncement("");
+                setIsAnnouncementModalOpen(false);
+                fetchAnnouncements();
+            }
+        } catch (error) {
+            console.error("cannrt add announcement ", error);
+        }
+    };
+
+
 
     return (
         <div className="bg-secondary min-h-screen flex flex-col pt-12">
@@ -182,10 +232,32 @@ const WorkspaceDashboard = () => {
 
                     <div className="bg-primary text-white p-5 rounded-lg shadow-md flex flex-col flex-1">
                         <h2 className="text-xl font-bold border-b pb-2 mb-3">Announcements</h2>
-                        <div className="bg-accent text-white p-,3 rounded-lg shadow-md flex-1 ">
-                            <p className={"m-2"}>Maybe someday this will work !</p>
-                        </div>
+                        {/* FINAL TO:DO make this scrollable */}
+                        <ul className="space-y-2 max-h-52 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-transparent flex-1 mb-2">
+                            {announcements.length > 0 ? (
+                                announcements.map((a) => (
+                                    <li
+                                        key={a.id}
+                                        onClick={() => setSelectedAnnouncementId(a.id)}
+                                        className="p-3 rounded-lg shadow-md bg-secondary flex justify-between items-center cursor-pointer hover:bg-accent transition"
+                                    >
+                                        <span className="break-words w-full">{a.content}</span>
+                                    </li>
+                                ))
+                            ) : (
+                                <p className="text-white">No announcements yet.</p>
+                            )}
+                        </ul>
+
+
+                        <button
+                            onClick={() => setIsAnnouncementModalOpen(true)}
+                            className="mt-3 w-full bg-accent text-white px-4 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition"
+                        >
+                            + Add Announcement
+                        </button>
                     </div>
+
 
 
 
@@ -193,33 +265,31 @@ const WorkspaceDashboard = () => {
                     <div className="bg-primary text-white p-5 rounded-lg shadow-md flex flex-col flex-1">
                         <h2 className="text-xl font-bold border-b pb-2 mb-3">To-Do List</h2>
 
-                        <ul className="space-y-2 max-h-64 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-transparent flex-1 mb-2">
+                        <ul className="space-y-2 max-h-52 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-transparent flex-1 mb-2">
                             {tasks.length > 0 ? (
                                 tasks.map((task) => (
                                     <li
                                         key={task.id}
-                                        onClick={() => changeTaskCompleted(task.id, task.completed)} // update task.completed
-                                        className={`p-3 rounded-lg shadow-md cursor-pointer flex justify-between items-center ${
-                                            task.completed ? "bg-green-600 line-through" : "bg-gray-700" // custom css if else 
+                                        onClick={() => changeTaskCompleted(task.id, task.completed)}
+                                        className={` hover:bg-accent transition p-3 rounded-lg shadow-md cursor-pointer flex justify-between items-center gap-2 ${
+                                            task.completed ? "bg-green-600 line-through" : "bg-secondary"
                                         }`}
                                     >
-                                        {task.task}
+                                        <span className="break-words overflow-hidden text-ellipsis flex-1">{task.task}</span>
 
-                                        {/*Bin ICON*/}
                                         <Trash2
                                             onClick={(e) => {
-                                                e.stopPropagation(); // stop propagation upwards issues with parent component deletion
+                                                e.stopPropagation();
                                                 deleteTask(task.id);
                                             }}
-                                            className="text-red-400 hover:text-red-500"
+                                            className="text-red-400 hover:text-red-500 flex-shrink-0"
                                             size={18}
                                         />
-
-
                                     </li>
+
                                 ))
                             ) : (
-                                <p className="text-gray-300">No tasks yet.</p>
+                                <p className="text-white">No tasks yet.</p>
                             )}
                         </ul>
 
@@ -240,6 +310,20 @@ const WorkspaceDashboard = () => {
                 setNewTask={setNewTask}
                 onSave={addTask} // when i save add the a task
             />
+            <CreateAnnouncementModal
+                isOpen={isAnnouncementModalOpen}
+                onClose={() => setIsAnnouncementModalOpen(false)}
+                newAnnouncement={newAnnouncement}
+                setNewAnnouncement={setNewAnnouncement} // modal will be used to set state
+                onSave={addAnnouncement}
+            />
+
+            <ShowAnnouncementModal
+                announcementId={selectedAnnouncementId} // pass in annaouncement
+                onClose={() => setSelectedAnnouncementId(null)} // rest state when closing
+            />
+
+
         </div>
     );
 };

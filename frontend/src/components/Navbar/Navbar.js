@@ -1,29 +1,43 @@
-import React from "react";
-import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-const Navbar = ({ user, workspace }) => {
-    const location = useLocation();
-    const params = useParams();
+const Navbar = ({ user, workspace}) => {
     const navigate = useNavigate();
+    const [hovered, setHovered] = useState(false);
+
+    // FINAL TO:DO make this better
+    const handleLogout = () => {
+        navigate("/");
+    };
 
     return (
         <nav className="bg-primary text-white py-4 px-6 flex justify-between items-center w-full fixed top-0 left-0 right-0 shadow-md z-50">
 
             <div className="text-xl font-bold">
-                {workspace ? workspace.code: "BUBBLE"}
+                {workspace ? workspace.name: "BUBBLE"}
             </div>
             {/* User Profile or Links */}
             { /* Default Navbar (NO USER LOGGED IN) */}
             {user ? (
-                <div className="flex items-center space-x-4">
+                <div
+                    className="flex items-center space-x-4 cursor-pointer relative"
+                    onClick={handleLogout}
+                    onMouseEnter={() => setHovered(true)}
+                    onMouseLeave={() => setHovered(false)}
+                >
                     <span>{user.name}</span>
                     <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white">
                         <img
-                            src={user?.picture || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}
+                            src={user?.picture}
                             className="w-full h-full object-cover"
                             alt="person"
                         />
                     </div>
+                    {hovered && (
+                        <div className="absolute -bottom-6 left-0 text-xs bg-white text-black px-2 py-1 rounded shadow">
+                            Click to log out
+                        </div>
+                    )}
                 </div>
             ) : (
                 // Default Navbar when no user is logged in

@@ -8,4 +8,7 @@ public interface TodoTaskRepository extends JpaRepository<TodoTask, Long> {
 
     // Find tasks by userId (String) and workspaceId (int)
     List<TodoTask> findByUserIdAndWorkspaceId(String userId, int workspaceId);
+
+    // find TO do task from workspace Id
+    List<TodoTask> findByWorkspaceId(int workspaceId);
 }

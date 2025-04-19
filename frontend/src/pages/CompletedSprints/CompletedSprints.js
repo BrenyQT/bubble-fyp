@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/Navbar/Navbar";
 import { ArrowLeft } from "lucide-react";
 import ShowTicketModal from "../../components/BacklogManagement/ShowTicketModal";
-import CompletedSprintTicketsModal from "../../components/CompletedSprintsTicketsModal"; // Sprint tickets modal
+import CompletedSprintTicketsModal from "../../components/SprintBacklog/CompletedSprintsTicketsModal"; // Sprint tickets modal
 
 const CompletedSprints = () => {
 
