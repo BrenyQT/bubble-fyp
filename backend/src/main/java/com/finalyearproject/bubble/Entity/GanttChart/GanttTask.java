@@ -1,4 +1,4 @@
-package com.finalyearproject.bubble.Entity;
+package com.finalyearproject.bubble.Entity.GanttChart;
 
 import com.finalyearproject.bubble.Entity.Workspaces.Workspaces;
 import jakarta.persistence.*;

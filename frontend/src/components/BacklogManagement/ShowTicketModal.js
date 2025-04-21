@@ -111,7 +111,7 @@ const ShowTicketModal = ({ ticket, onClose, user, onTicketUpdated }) => {
                 <div className="flex justify-between items-start border-b pb-4">
                     <div>
                         <p className="text-sm text-white font-medium">Ticket Number: {ticket.id || "TICKET-X"}</p>
-                        <h2 className="text-2xl font-bold text-white">{ticket.name || "TICKET-NAME-UNKNOWN"}</h2>
+                        <h2 className="text-2xl font-bold text-white break-all">{ticket.name || "TICKET-NAME-UNKNOWN"}</h2>
                     </div>
                     <div className="space-x-2 flex items-center">
                         <span className="bg-accent text-white px-3 py-1 rounded text-sm font-medium">
@@ -125,7 +125,7 @@ const ShowTicketModal = ({ ticket, onClose, user, onTicketUpdated }) => {
                     <div className="md:col-span-2 space-y-6">
                         <div>
                             <p className="text-sm font-semibold text-white mb-1">Description</p>
-                            <p className="text-white">{ticket.description || "No description provided."}</p>
+                            <p className="text-white break-all ">{ticket.description || "No description provided."}</p>
                         </div>
                     </div>
 

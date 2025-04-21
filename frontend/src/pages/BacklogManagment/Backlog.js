@@ -77,7 +77,7 @@ const BacklogPage = () => {
     const handleClose = () => setSelectedTicket(null);
 
     return (
-        <div className="bg-secondary min-h-screen flex flex-col pt-12">
+        <div className="bg-secondary h-screen flex flex-col pt-12">
             <Navbar user={user} workspace={workspace} />
 
             {/* Top Buttons */}
@@ -120,49 +120,51 @@ const BacklogPage = () => {
             </h1>
 
             {/* Backlog Ticket Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-6 pb-10 mt-6">
-                {/*Dirty fix for this map all tickets which arent completed if no filter or label = filter   */}
-                {tickets
-                    .filter(ticket => !ticket.completed && (!labelFilter || ticket.label === labelFilter))
-                    .map((ticket) => {
-                        const timestamp = new Date(ticket.createdAt);
-                        const formattedTime = format(timestamp, "hh:mm a");
-                        const formattedDate = format(timestamp, "MMM d, yyyy");
+            <div className="flex-1 overflow-y-auto px-6 mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-10">
+                    {/*Dirty fix for this map all tickets which arent completed if no filter or label = filter   */}
+                    {tickets
+                        .filter(ticket => !ticket.completed && (!labelFilter || ticket.label === labelFilter))
+                        .map((ticket) => {
+                            const timestamp = new Date(ticket.createdAt);
+                            const formattedTime = format(timestamp, "hh:mm a");
+                            const formattedDate = format(timestamp, "MMM d, yyyy");
 
-                        return (
-                            <div
-                                key={ticket.id}
-                                className={`p-4 rounded-lg shadow transition cursor-pointer 
+                            return (
+                                <div
+                                    key={ticket.id}
+                                    className={`p-4 rounded-lg shadow transition cursor-pointer 
                     ${ticket.highPriority ? "border-2 border-red-500 bg-primary hover:bg-accent" : "bg-primary hover:bg-accent"}`}
-                                onClick={() => setSelectedTicket(ticket)}
-                            >
-                                <div className="flex justify-between items-center mb-2">
-                                    <h3 className="text-lg font-semibold text-white">{ticket.name}</h3>
-                                    <span className="text-xs text-white bg-accent px-2 py-1 rounded">{`#${ticket.ticketNumber}`}</span>
+                                    onClick={() => setSelectedTicket(ticket)}
+                                >
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h3 className="text-lg font-semibold text-white break-all">{ticket.name}</h3>
+                                        <span className="text-xs text-white bg-accent px-2 py-1 rounded">{`#${ticket.ticketNumber}`}</span>
+                                    </div>
+                                    <p className="text-sm text-white whitespace-pre-wrap break-words">{ticket.description}</p>
+                                    <p className="text-white mt-1">Type: {ticket.label || "Unknown"}</p>
+                                    <p className="text-xs text-white">
+                                        Created: {formattedTime} - {formattedDate}
+                                    </p>
                                 </div>
-                                <p className="text-sm text-white">{ticket.description}</p>
-                                <p className="text-white mt-1">Type: {ticket.label || "Unknown"}</p>
-                                <p className="text-xs text-white">
-                                    Created: {formattedTime} - {formattedDate}
-                                </p>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
 
-                {/* No tickets at all */}
-                {tickets.filter(ticket => !ticket.completed && (!labelFilter || ticket.label === labelFilter)).length === 0 && (
-                    <p className="text-white text-center col-span-full">No tickets yet.</p>
-                )}
+                    {/* No tickets at all */}
+                    {tickets.filter(ticket => !ticket.completed && (!labelFilter || ticket.label === labelFilter)).length === 0 && (
+                        <p className="text-white text-center col-span-full">No tickets yet.</p>
+                    )}
 
 
-                {/* Filter Modal */}
-                {showFilterModal && (
-                    <FilterModal
-                        onClose={() => setShowFilterModal(false)}
-                        onApply={(label) => setLabelFilter(label)}
-                        currentFilter={labelFilter}
-                    />
-                )}
+                    {/* Filter Modal */}
+                    {showFilterModal && (
+                        <FilterModal
+                            onClose={() => setShowFilterModal(false)}
+                            onApply={(label) => setLabelFilter(label)}
+                            currentFilter={labelFilter}
+                        />
+                    )}
+                </div>
             </div>
 
 

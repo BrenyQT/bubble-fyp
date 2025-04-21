@@ -2,7 +2,7 @@ package com.finalyearproject.bubble.Services.Workspaces;
 
 import com.finalyearproject.bubble.Entity.Authentication.oAuthUserDetails;
 import com.finalyearproject.bubble.Entity.BacklogManagement.Ticket;
-import com.finalyearproject.bubble.Entity.GanttTask;
+import com.finalyearproject.bubble.Entity.GanttChart.GanttTask;
 import com.finalyearproject.bubble.Entity.SprintBacklog.Sprint;
 import com.finalyearproject.bubble.Entity.WorkspaceChat.Message;
 import com.finalyearproject.bubble.Entity.WorkspaceDashboard.Announcement;

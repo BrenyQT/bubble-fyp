@@ -1,6 +1,6 @@
 package com.finalyearproject.bubble.Repository;
 
-import com.finalyearproject.bubble.Entity.GanttTask;
+import com.finalyearproject.bubble.Entity.GanttChart.GanttTask;
 import com.finalyearproject.bubble.Entity.Workspaces.Workspaces;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -25,6 +25,6 @@ public interface SprintRepository extends JpaRepository<Sprint, Integer> {
 
     // TO:DO - this is kinda bad lol fix this
     // get a sprint using workspace.id and ticket.id
-    @Query("SELECT s FROM Sprint s JOIN s.tickets t WHERE s.workspace.id = :workspaceId AND t.id = :ticketId")
+    @Query("SELECT sprint FROM Sprint sprint JOIN sprint.tickets ticket WHERE sprint.workspace.id = :workspaceId AND ticket.id = :ticketId")
     Sprint findByWorkspaceAndTicket(@Param("workspaceId") int workspaceId, @Param("ticketId") Long ticketId);
 }

@@ -1,6 +1,6 @@
 package com.finalyearproject.bubble.Controller.GanttChart;
 
-import com.finalyearproject.bubble.Entity.GanttTask;
+import com.finalyearproject.bubble.Entity.GanttChart.GanttTask;
 import com.finalyearproject.bubble.Entity.Workspaces.Workspaces;
 import com.finalyearproject.bubble.Repository.GanttTaskRepository;
 import com.finalyearproject.bubble.Repository.Workspaces.WorkspacesRepository;
