@@ -139,6 +139,7 @@ const WorkspaceDashboard = () => {
 
             const response = await fetch("http://localhost:8080/addAnnouncements", {
                 method: "POST",
+                headers: {"Content-Type": "application/json"}, // fromatting
                 body: JSON.stringify(payload),
             });
 
