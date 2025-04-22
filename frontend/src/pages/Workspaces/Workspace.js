@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import Navbar from "../../components/Navbar";
-import JoinWorkspaceModal from "../../components/JoinWorkspaceModal";
+import Navbar from "../../components/Navbar/Navbar";
+import JoinWorkspaceModal from "../../components/WorkspaceDashboard/JoinWorkspaceModal";
 
 /*
 Set sate for user (Set to null)
@@ -13,19 +13,6 @@ const Workspace = () => {
     const [user, setUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [quote, setQuote] = useState("");
-
-
-    const quotes = [
-        "Lets all collaborate !",
-        "Lets work !"
-    ];
-
-    // Function to pick a random quote
-    const getRandomQuote = () => {
-        const randomIndex = Math.floor(Math.random() * quotes.length);
-        return quotes[randomIndex];
-    }
-
 
     // BEFORE THE PAGE LOADS
     // Fetch user object for current user signed in via JWT
@@ -44,7 +31,7 @@ const Workspace = () => {
             .catch(error => console.error("Error fetching user:", error));
 
         // Set random quote
-        setQuote(getRandomQuote());
+        setQuote("Lets work !!");
     }, []);
 
 
@@ -70,6 +57,7 @@ const Workspace = () => {
                 <img
                     src="https://cdn-icons-png.flaticon.com/512/1874/1874046.png"
                     className="w-20 h-20 mb-4"
+                    alt={"silly"}
                 />
                 <h1 className="text-4xl font-bold mb-4 text-white">
                     {user ? `Hello, ${user.name} 👋` : "BUBBLE"}

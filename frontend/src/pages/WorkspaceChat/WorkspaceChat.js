@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import Navbar from "../../components/Navbar";
-import { ArrowLeft } from "lucide-react"; // component library for the back home arrow.
-import format from "date-fns/format"; // https://date-fns.org/docs/format TO:DO Pattern check this.
-import { Client } from "@stomp/stompjs"; // STOMP (Text Oriented Messaging Protocol. Helps the application act as a pub sub (client subscribes to server endpoint)
-import SockJS from "sockjs-client"; // Fallback if browser doesnt support sockets.
-
+import React, {useEffect, useState, useRef} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
+import Navbar from "../../components/Navbar/Navbar";
+import {ArrowLeft} from "lucide-react";
+import format from "date-fns/format";
+import {Client} from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import ReactFlagsSelect from "react-flags-select";
+import axios from "axios";
 
 /**
  SOCKET: A phone line (establishes connection) ensures a stable connection across different browsers
@@ -25,23 +26,42 @@ import SockJS from "sockjs-client"; // Fallback if browser doesnt support socket
  */
 
 const WorkspaceChat = () => {
+    const [messages, setMessages] = useState([]); // state which loads messages in a workpsace chat
+    const [newMessage, setNewMessage] = useState(""); // new message for text bar
+    const [translatedMessages, setTranslatedMessages] = useState([]); // secound array to store messages when translated
+    const [selectedLang, setSelectedLang] = useState("en"); // set default to enlgish
+    const messagesEndRef = useRef(null); // used for flow transition when opening chat
+    const stompClientRef = useRef(null); // reate a reference to a websocket connection
+    const selectedLangRef = useRef(selectedLang); // GONNA HAVE TO SOTRE THE LANGAUGE
+
     const location = useLocation();
     const navigate = useNavigate();
-    const { workspace, user } = location.state || {}; // Passed in from workspace list as props.
-    const [messages, setMessages] = useState([]); // This stores the chat messages when the
-    const [newMessage, setNewMessage] = useState(""); //text box state management
-    const messagesEndRef = useRef(null);
-    const stompClientRef = useRef(null);
 
-    // Return to workspace page where user/workspace will be reloaded.
-    // Else retrieve workspace messages
-    // Use effect executes websocket connection and fetching messages
+    const user = location.state?.user; // set user
+    const workspace = location.state?.workspace; // set workspace
+    // static languages array
+    const languageMap = {
+        GB: "en",
+        FR: "fr",
+        DE: "de",
+        ES: "es",
+        IT: "it",
+        HU: "hu",
+        PL: "pl",
+        BG: "bg"
+    };
+
+    useEffect(() => {
+        selectedLangRef.current = selectedLang;
+    }, [selectedLang]);
+
     useEffect(() => {
         if (!workspace || !user) {
             navigate("/viewWorkspace");
         } else {
             fetchMessages();
-            if (!stompClientRef.current) { // If no connection, connect  (Prevents multiple web sock connections) #TO:DO make sure this works.
+            //connect to web sockets if no connection is already connected
+            if (!stompClientRef.current) {
                 connectWebSocket();
             }
         }
@@ -49,150 +69,248 @@ const WorkspaceChat = () => {
 
     /*
     Client subscription to server for websockets.
-
      */
     const connectWebSocket = () => {
-        const socket = new SockJS("http://localhost:8080/chat"); // matches registry.addEndpoint("/chat").withSockJS(); in sockets config
+        const socket = new SockJS("http://localhost:8080/chat");
         const client = new Client({
-            webSocketFactory: () => socket, // Uses SocketJS if websockets is blocked on a browser
-            reconnectDelay: 5000, // Allows a reconnection every 5seconds (If disconnected)
+            webSocketFactory: () => socket,
+            reconnectDelay: 5000,
             onConnect: () => {
+                client.subscribe(`/topic/${workspace.id}`, async (message) => {
+                    const receivedMessage = JSON.parse(message.body);
 
-                client.subscribe(`/topic/${workspace.id}`, (message) => { // make the client subscribe to the current workspace
-                    const receivedMessage = JSON.parse(message.body); // get the body of the message recieved
-                    setMessages(prev => [...prev, receivedMessage]); // Updating the previous messages
+                    // Translate the received message based on the current language
+                    const translated = await translateMessage(receivedMessage.content, selectedLangRef.current);
+
+                    // Add the received message to the messages state and update translated messages
+                    setMessages((prev) => [...prev, receivedMessage]);
+                    setTranslatedMessages((prev) => [...prev, translated]);
                 });
             },
-            onStompError: (frame) => console.error("WebSocket Error:", frame), // Error handling
+            onStompError: (frame) => console.error("WebSocket Error:", frame),
         });
 
-        client.activate(); // Starts the STOMP client connection to server. (ensures the client connects to the server and subscribes to topic)
-        stompClientRef.current = client; // Storing the STOMP client in a useRef variable (prevents recreating multiple connections)
+        client.activate();
+        stompClientRef.current = client;
 
-        // When closing the chat page the WebSocket connection is closed
+        // When closing the chat page, the WebSocket connection is closed
         return () => {
             if (client) client.deactivate();
         };
     };
 
+
+
     //  Fetch the messages sent from the past in a particular group
     const fetchMessages = () => {
         fetch(`http://localhost:8080/messages?workspaceId=${workspace.id}`, {
             method: "GET",
-            credentials: "include", // includes my Cookies??
-            headers: { "Accept": "application/json" }, // JSON Format
+            credentials: "include",
+            headers: { "Accept": "application/json" }, // wasnt fetching idk why this works
         })
             .then(response => response.json())
-            .then(data => setMessages(Array.isArray(data) ? data : [])) // sets the array if theres data in the json else empty
-            .catch(error => console.error("Error fetching the past messages :", error)); // Error handling
+            .then(async data => {
+                setMessages(Array.isArray(data) ? data : []); // non empty array
+                const translated = await Promise.all( //make sure all send
+                    data.map(msg => translateMessage(msg.content, selectedLang)) // translate all the messages
+                );
+                setTranslatedMessages(translated);
+            })
+            .catch(error => console.error("Error fetching the past messages :", error));
     };
 
+    const translateMessage = async (text, lang) => {
+        if (lang === "en" || !text?.trim()) return text;
 
+        try {
+            const response = await axios.get("https://translation.googleapis.com/language/translate/v2", {
+                params: {
+                    q: text,
+                    target: lang,
+                    key: "GOOGLE_TRANSLATE_API_KEY",
+
+                },
+            });
+
+
+            // Congrats Brendan it was worth the headache, but i left this ^
+            const translated = response?.data?.data?.translations?.[0]?.translatedText;
+            /*
+                                 {
+                      "data": {
+                        "translations": [
+                          {
+                            "translatedText": My message translated :DDD"
+                          }
+                        ]
+                      }
+                    }
+            */
+
+
+            return translated || text; // return text if cannot translate
+            // TO:DO have a more graceful handling when it cant translate
+        } catch (err) {
+            console.error("cannot translate :C:", err);
+            return text;
+        }
+    };
+
+    //checks for a connection
     const sendMessage = () => {
-        // removes extra spaces and not blank, checks if websocket client exists and connection is active
         if (!newMessage.trim() || !stompClientRef.current || !stompClientRef.current.connected) return;
 
-        const messageData = {
-            sender: user,
+        //create Message Payload
+        const payload = {
+            sender: { id: user.id },
             content: newMessage,
             workspace: { id: workspace.id },
-            timestamp: new Date().toISOString(),
         };
 
         stompClientRef.current.publish({
-            destination: "/broadcast/sendMessage", // Sends the message to the WebSocket server
-            body: JSON.stringify(messageData),
+            destination: "/broadcast/sendMessage",
+            body: JSON.stringify(payload),
         });
 
-        setNewMessage(""); // remove all from input
+        setNewMessage("");
     };
 
-    // smooth transition to bottom div containing a ref
-    // TO:DO mess around with styles
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
-    return (
-        <div className="bg-secondary min-h-screen flex flex-col">
-            <Navbar user={user} />
+    // set the new language and translate all messages
+    const handleLangChange = async (countryCode) => {
+        const lang = languageMap[countryCode];
+        setSelectedLang(lang);
 
-            <div className="mt-[80px] w-full max-w-6xl mx-auto py-5">
+        const translated = await Promise.all(
+            messages.map(msg => msg.content?.trim() ? translateMessage(msg.content, lang) : msg.content)
+        );
+
+        setTranslatedMessages(translated);
+    };
+
+    // TO:DO  man fuck
+    // Congratulations Brendan,  i survided
+    const disconnectWebSocketConnection = (client) => {
+        if (client && client.connected) {
+            console.log("Deactivating WebSocket connection");
+            client.deactivate();
+        } else {
+            console.log("No active WebSocket connection to deactivate");
+        }
+
+        // Then navigate to the workspace dashboard
+        navigate(`/workspaceDashboard/${workspace.id}`, {state: {user, workspace}});
+    };
+
+    // croll to this ref div really cool way of doing this
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({behavior: "smooth"});
+    }, [messages]);
+
+
+    // TO:DO this is fragile make components
+
+
+    return (
+        <div className="bg-secondary min-h-screen flex flex-col h-screen">
+            <Navbar user={user} workspace={workspace}/>
+
+            <div className="mt-[80px] w-full px-6 flex justify-between items-center">
+                {/* Return button */}
                 <button
-                    onClick={() => navigate("/viewWorkspace", { state: { user } })}
-                    className="flex items-center text-white px-3 py-2 bg-primary rounded-lg shadow-md hover:bg-opacity-80 transition duration-200 text-lg font-semibold"
+                    onClick={() => disconnectWebSocketConnection(stompClientRef.current)} // remove connection works :,,,,D
+                    className="flex items-center text-white bg-primary px-4 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition"
                 >
-                    <ArrowLeft size={24} className="mr-2" />
-                    Back to Workspaces
+                    <ArrowLeft size={20} className="mr-2"/>
+                    Return to Workspace View
                 </button>
+
+                {/* Language selector Drop Down
+                 To:DO mess around with this tailwind css
+                 */}
+                <div className="bg-primary text-primary rounded-lg hover:bg-opacity-90 transition flex items-center">
+                    <ReactFlagsSelect
+                        className="bg-primary rounded-lg"
+                        countries={["GB", "FR", "DE", "ES", "IT", "HU", "PL", "BG"]}
+                        customLabels={{
+                            GB: "English",
+                            FR: "Français",
+                            DE: "Deutsch",
+                            ES: "Español",
+                            IT: "Italiano",
+                            HU: "Magyar",
+                            PL: "Polska",
+                            BG: "Bŭlgarski"
+
+                        }}
+                        selected={Object.keys(languageMap).find(key => languageMap[key] === selectedLang)}
+                        onSelect={handleLangChange}
+                        selectButtonClassName="bg-primary text-white"
+                        fullWidth={false}
+                        showSelectedLabel={true}
+                        showOptionLabel={true}
+                    />
+                </div>
             </div>
 
-            <div className="flex flex-col items-center w-full">
-                <h1 className="text-white text-2xl font-bold mb-2">{workspace.name} Chat</h1>
+            {/* Chat window */}
+            <div
+                className="flex-1 overflow-y-auto rounded-lg p-4 scrollbar-thin scrollbar-thumb-white scrollbar-track-transparent border border-white/20 bg-opacity-10 bg-primary mt-4">
 
-                {/* Outer chat container */}
-                <div className="w-full max-w-6xl bg-opacity-30 bg-white backdrop-blur-lg p-5 rounded-lg border border-white/50 shadow-lg">
+            {messages.length > 0 ? (
+                    messages.map((msg, index) => {
+                        const timestamp = msg.timestamp ? new Date(msg.timestamp) : null;
+                        const formattedTime = timestamp ? format(timestamp, "hh:mm a") : "Unknown Time";
+                        const formattedDate = timestamp ? format(timestamp, "MMM d, yyyy") : "Unknown Date";
 
-                    {/* Scrollable chat window */}
-                    <div className="max-h-[500px] overflow-y-auto rounded-lg p-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent border border-white/20 bg-opacity-10 bg-gray-900">
+                        const isCurrentUser = msg.senderEmail === user.email;
 
-                        {/* If messages exist in workspace, map over them and create constants for each message */}
-                        {messages.length > 0 ? (
-                            messages.map((msg, index) => {
-                                const timestamp = msg.timestamp ? new Date(msg.timestamp) : null;
-                                const formattedTime = timestamp ? format(timestamp, "hh:mm a") : "Unknown Time";
-                                const formattedDate = timestamp ? format(timestamp, "MMM d, yyyy") : "Unknown Date";
-
-                                {/* Render each message as a card */}
-                                {/* TO DO: Consider making this into a reusable component */}
-                                return (
-                                    <div key={index} className={`flex items-start p-3 mb-2 rounded-lg max-w-[75%] 
-                                    ${msg.sender?.email === user.email ? "bg-blue-500 text-white ml-auto" : "bg-gray-700 text-white"} shadow-md`}
-                                    >
-                                        <img
-                                            src={msg.sender?.picture || "/default-profile.png"}
-                                            alt={msg.sender?.name || "user"}
-                                            className="w-8 h-8 rounded-full mr-3 border border-white/30"
-                                        />
-                                        <div>
-                                            <div className="flex items-center">
-                                                <strong className="text-white">{msg.sender?.name || "Unknown User"}</strong>
-                                                <span className="ml-2 text-sm text-gray-300">{formattedTime} • {formattedDate}</span>
-                                            </div>
-                                            <p className="text-white">{msg.content}</p>
-                                        </div>
+                        return (
+                            //check if user signedin is the person sending message
+                            <div key={index} className={`flex items-start p-3 mb-2 rounded-lg max-w-[75%] 
+                ${isCurrentUser ? "bg-accent text-white ml-auto" : "bg-primary text-white"} shadow-md`}>
+                                <img
+                                    src={msg.senderPicture}
+                                    alt={msg.senderName || "user"}
+                                    className="w-8 h-8 rounded-full mr-3 border border-white/30"
+                                />
+                                <div>
+                                    <div className="flex items-center">
+                                        <strong className="text-white">{msg.senderName || "Unknown User"}</strong>
+                                        <span
+                                            className="ml-2 text-sm text-white">{formattedTime} - {formattedDate}</span>
                                     </div>
-                                );
-                            })
-                        ) : (
-                            <p className="text-white text-center">No messages yet.</p>
-                        )}
+                                    <p className="text-white">
+                                        {translatedMessages[index] || msg.content || "No content"}
+                                    </p>
+                                </div>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <p className="text-white text-center">No messages yet.</p>
+                )}
 
-                        {/* This helps auto-scroll to the newest message using a ref */}
-                        <div ref={messagesEndRef}></div>
-                    </div>
+                <div ref={messagesEndRef}></div>
+            </div>
 
-                    {/* Input field and send button */}
-                    <div className="mt-4 flex">
-                        {/* Handles message input */}
-                        <input
-                            type="text"
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            className="flex-1 p-3 rounded-lg text-black shadow-md border border-white/30"
-                            placeholder="Type a message..."
-                        />
-                        <button
-                            onClick={sendMessage}
-                            className="ml-3 bg-primary text-white px-5 py-3 rounded-lg shadow-md"
-                        >
-                            Send
-                        </button>
-                    </div>
-                </div>
+            {/* Input  Send  grid */}
+            <div className="mt-4 flex px-6">
+                <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    className="flex-1 p-3 rounded-lg text-black shadow-md border border-white/30"
+                    placeholder="Type a message..."
+                />
+                <button
+                    onClick={sendMessage}
+                    className="ml-3 bg-primary text-white px-5 py-3 rounded-lg shadow-md"
+                >
+                    Send
+                </button>
             </div>
         </div>
     );
-
 };
 
 export default WorkspaceChat;

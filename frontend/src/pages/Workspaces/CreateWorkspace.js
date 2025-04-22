@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/Navbar/Navbar";
 import { ArrowLeft } from "lucide-react";
 
 /*
@@ -109,10 +109,15 @@ const CreateWorkspace = () => {
                 <div className="relative cursor-pointer" onClick={handleImageClick}>
                     {previewImage ? (
                         <img src={previewImage}
-                             className="w-24 h-24 rounded-full mb-6 object-cover border-2 border-accent shadow-lg" />
+                             className="w-24 h-24 rounded-full mb-6 object-cover border-2 border-accent shadow-lg"
+                             alt = {"silly"}
+                        />
+
                     ) : (
                         <img src="https://cdn-icons-png.flaticon.com/512/456/456212.png"
-                             className="w-24 h-24 rounded-full mb-6 object-cover border-2 border-accent shadow-lg" />
+                             className="w-24 h-24 rounded-full mb-6 object-cover border-2 border-accent shadow-lg"
+                             alt = {"silly"}
+                        />
                     )}
                 </div>
 

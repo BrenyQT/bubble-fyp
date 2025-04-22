@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/Navbar/Navbar";
 
 const Home = () => {
     const handleLogin = () => {
@@ -25,7 +25,7 @@ const Home = () => {
                     className="bg-primary text-white px-6 py-3 rounded-lg shadow-md flex items-center hover:bg-accent transition duration-200"
                 >
                     <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1024px-Google_%22G%22_logo.svg.png"
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1024px-Google_%22G%22_logo.svg.png" alt="why"
                         className="w-6 h-6 mr-2"
                     />
                     Login with Google
