@@ -127,7 +127,7 @@ const WorkspaceChat = () => {
                 params: {
                     q: text,
                     target: lang,
-                    key: "AIzaSyBg6crFqzluJpprAPmVbcVHokPs2ResoAI",
+                    key: "GOOGLE_TRANSLATE_API_KEY",
 
                 },
             });
@@ -254,7 +254,7 @@ const WorkspaceChat = () => {
 
             {/* Chat window */}
             <div
-                className="flex-1 overflow-y-auto rounded-lg p-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent border border-white/20 bg-opacity-10 bg-primary mt-4">
+                className="flex-1 overflow-y-auto rounded-lg p-4 scrollbar-thin scrollbar-thumb-white scrollbar-track-transparent border border-white/20 bg-opacity-10 bg-primary mt-4">
 
             {messages.length > 0 ? (
                     messages.map((msg, index) => {

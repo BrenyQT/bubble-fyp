@@ -131,7 +131,8 @@ const ManageSprintTicketsModal = ({isOpen, onClose, sprintId, workspaceId, onTic
                                             : "bg-white"
                                     }`}
                                 >
-                                    <span>#{ticket.ticketNumber} - {ticket.name}</span>
+
+                                    <span  className="break-words w-full"> #{ticket.ticketNumber} - {ticket.name}</span>
                                 </div>
                             ))
                         ) : (
@@ -162,7 +163,7 @@ const ManageSprintTicketsModal = ({isOpen, onClose, sprintId, workspaceId, onTic
                                         : "bg-white"
                                 }`}
                             >
-                                #{ticket.ticketNumber} - {ticket.name}
+                                <span  className="break-words"> #{ticket.ticketNumber} - {ticket.name}</span>
                             </div>
                         ))
                     ) : (

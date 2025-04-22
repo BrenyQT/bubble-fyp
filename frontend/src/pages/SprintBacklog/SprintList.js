@@ -88,7 +88,7 @@ const SprintList = () => {
             </div>
 
             <div className="flex flex-col items-center w-full">
-                <h1 className="text-white text-2xl font-bold mb-1">{workspace.name}'s Sprints</h1>
+                <h1 className="text-white text-2xl font-bold mb-1 break-words">{workspace.name}'s Sprints</h1>
 
                 <div className="w-full max-w-6xl px-4 py-8">
                     <div className="max-h-[500px] overflow-y-auto rounded-lg border border-white/30 bg-opacity-20 bg-white backdrop-blur-lg p-4 shadow-lg scrollbar-thin scrollbar-thumb-[rgba(255,255,255,0.3)] scrollbar-track-transparent">

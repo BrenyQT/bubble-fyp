@@ -44,7 +44,7 @@ const CreateGanttChartTaskModal = ({
                             type="text"
                             value={label}
                             onChange={(e) => setLabel(e.target.value)} // set state of parent compnent
-                            className="border border-gray-300 px-3 py-2 rounded-lg text-sm text-black bg-gray-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            className="border border-white px-3 py-2 rounded-lg text-sm text-black bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         />
                     </div>
 
@@ -54,7 +54,7 @@ const CreateGanttChartTaskModal = ({
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
-                            className="border border-gray-300 px-3 py-2 rounded-lg text-sm text-black bg-gray-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            className="border border-white px-3 py-2 rounded-lg text-sm text-black bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         />
                     </div>
 
@@ -64,7 +64,7 @@ const CreateGanttChartTaskModal = ({
                             type="date"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            className="border border-gray-300 px-3 py-2 rounded-lg text-sm text-black bg-gray-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            className="border border-white px-3 py-2 rounded-lg text-sm text-black bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         />
                     </div>
 

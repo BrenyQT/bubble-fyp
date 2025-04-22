@@ -21,7 +21,7 @@ const CreateAnnouncementModal = ({ isOpen, onClose, newAnnouncement, setNewAnnou
                     value={newAnnouncement}
                     onChange={(e) => setNewAnnouncement(e.target.value)} // need to pass content announcement back to parent
                     placeholder="Type full announcement here..."
-                    className="w-full p-3 rounded-lg bg-white text-black border border-gray-600 resize-none h-32 mb-4"
+                    className="w-full p-3 rounded-lg bg-white text-black border border-white resize-none h-32 mb-4"
                 />
 
                 <button

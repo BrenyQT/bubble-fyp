@@ -32,7 +32,7 @@ const KanbanBoardTask = ({task, onClick}) => {
         <div
             ref={drag} // adds the drag functionality
             onClick={onClick} // shows the showTicketModal
-            className={`relative p-3 bg-white text-black rounded-lg shadow-md border border-gray-300 cursor-pointer ${isDragging ? "opacity-50" : ""} ${highPriorityClass}`}
+            className={`relative p-3 bg-white text-black rounded-lg shadow-md border border-white cursor-pointer ${isDragging ? "opacity-50" : ""} ${highPriorityClass}`}
         >
             {/* show the picture if user is assigned  */}
 
@@ -40,13 +40,16 @@ const KanbanBoardTask = ({task, onClick}) => {
                 <img
                     src={task.assignedTo.picture}
                     alt={task.assignedTo.name || "Assigned User"}
-                    className="absolute top-2 right-2 w-8 h-8 rounded-full object-cover border-2 border-red-600 shadow-sm"
+                    className="absolute top-2 right-2 w-8 h-8 rounded-full object-cover border-2 border-red-600 "
                 />
             )}
 
+            <div className="break-words whitespace-pre-wrap pr-12">
 
             {task.text || task.name}
         </div>
+        </div>
+
     );
 };
 
@@ -109,7 +112,7 @@ const KanbanBoard = () => {
         // update backend state
         fetch(`http://localhost:8080/tickets/updateStatus/${taskId}`, {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json"}, // how it expects the payload format
             body: JSON.stringify({status: updatedStatusOfTicket}),
         })
             .then(() => fetchTasks()) // UPDATE FRONTEND
@@ -234,7 +237,7 @@ const KanbanBoard = () => {
                             {`${workspace.name} (Current Sprint) - Kanban Board`}
                         </h1>
 
-                        <div className="flex justify-center space-x-6 p-6">
+                        <div className="flex justify-center space-x-6 p-6 break-words">
                             {/* Create each of the columns based off my static labels  */}
 
                             {COLUMN_NAMES.map((name) => (

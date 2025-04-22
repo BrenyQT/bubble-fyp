@@ -38,7 +38,7 @@ const CreateTicketModal = ({user, workspace, onTicketCreated}) => {
                 `http://localhost:8080/tickets/create/${workspace.id}`,
                 {
                     method: "POST",
-                    headers: {"Content-Type": "application/json"}, // cookies JWT
+                    headers: {"Content-Type": "application/json"}, // for formatting
                     body: JSON.stringify(payload), // stringified Json ticket object to parse in backend
                 }
             );

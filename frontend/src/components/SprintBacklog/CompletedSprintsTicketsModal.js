@@ -25,7 +25,7 @@ const CompletedSprintTicketsModal = ({ isOpen, onClose, tickets, onTicketClick }
                                 className="p-2  rounded cursor-pointer bg-accent"
                                 onClick={() => onTicketClick(ticket)} // Trigger onTicketClick when a ticket is clicked
                             >
-                                <p className={" text white"}>#{ticket.ticketNumber} - {ticket.name}</p>
+                                <p className="text-white break-words ">#{ticket.ticketNumber} - {ticket.name}</p>
                             </div>
                         ))
                     ) : (

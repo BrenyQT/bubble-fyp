@@ -111,7 +111,9 @@ const ShowTicketModal = ({ ticket, onClose, user, onTicketUpdated }) => {
                 <div className="flex justify-between items-start border-b pb-4">
                     <div>
                         <p className="text-sm text-white font-medium">Ticket Number: {ticket.id || "TICKET-X"}</p>
+                        <div className="break-words whitespace-pre-wrap pr-12">
                         <h2 className="text-2xl font-bold text-white break-all">{ticket.name || "TICKET-NAME-UNKNOWN"}</h2>
+                        </div>
                     </div>
                     <div className="space-x-2 flex items-center">
                         <span className="bg-accent text-white px-3 py-1 rounded text-sm font-medium">

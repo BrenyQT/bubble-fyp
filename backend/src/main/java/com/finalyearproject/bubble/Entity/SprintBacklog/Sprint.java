@@ -66,6 +66,7 @@ public class Sprint {
     public Workspaces getWorkspace() { return workspace; }
     public oAuthUserDetails getCreatedBy() { return createdBy; }
     public List<Ticket> getTickets() { return tickets; }
+
     public void setId(int id) { this.id = id; }
     public void setName(String name) { this.name = name; }
     public void setGoal(String goal) { this.goal = goal; }

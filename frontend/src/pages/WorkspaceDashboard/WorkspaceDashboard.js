@@ -234,7 +234,7 @@ const WorkspaceDashboard = () => {
                     <div className="bg-primary text-white p-5 rounded-lg shadow-md flex flex-col flex-1">
                         <h2 className="text-xl font-bold border-b pb-2 mb-3">Announcements</h2>
                         {/* FINAL TO:DO make this scrollable */}
-                        <ul className="space-y-2 max-h-52 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-transparent flex-1 mb-2">
+                        <ul className="space-y-2 max-h-52 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white scrollbar-track-transparent flex-1 mb-2">
                             {announcements.length > 0 ? (
                                 announcements.map((a) => (
                                     <li
@@ -266,7 +266,7 @@ const WorkspaceDashboard = () => {
                     <div className="bg-primary text-white p-5 rounded-lg shadow-md flex flex-col flex-1">
                         <h2 className="text-xl font-bold border-b pb-2 mb-3">To-Do List</h2>
 
-                        <ul className="space-y-2 max-h-52 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-transparent flex-1 mb-2">
+                        <ul className="space-y-2 max-h-52 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white scrollbar-track-transparent flex-1 mb-2">
                             {tasks.length > 0 ? (
                                 tasks.map((task) => (
                                     <li

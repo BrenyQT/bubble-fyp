@@ -137,9 +137,11 @@ const BacklogPage = () => {
                     ${ticket.highPriority ? "border-2 border-red-500 bg-primary hover:bg-accent" : "bg-primary hover:bg-accent"}`}
                                     onClick={() => setSelectedTicket(ticket)}
                                 >
+                                    <div className="flex justify-end mb-1">
+                                    <span className="text-xs flex justify-end text-white bg-accent px-2 py-1 rounded">{`#${ticket.ticketNumber}`}</span>
+                                    </div>
                                     <div className="flex justify-between items-center mb-2">
                                         <h3 className="text-lg font-semibold text-white break-all">{ticket.name}</h3>
-                                        <span className="text-xs text-white bg-accent px-2 py-1 rounded">{`#${ticket.ticketNumber}`}</span>
                                     </div>
                                     <p className="text-sm text-white whitespace-pre-wrap break-words">{ticket.description}</p>
                                     <p className="text-white mt-1">Type: {ticket.label || "Unknown"}</p>

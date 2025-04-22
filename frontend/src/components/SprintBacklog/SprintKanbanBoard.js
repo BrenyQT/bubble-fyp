@@ -27,7 +27,7 @@ const KanbanBoardTask = ({task, onClick}) => {
         <div
             ref={drag} // adds the drag functionality
             onClick={onClick} // shows the showTicketModal
-            className={`relative p-3 bg-white text-black rounded-lg shadow-md border border-gray-300 cursor-pointer ${isDragging ? "opacity-50" : ""} ${highPriorityClass}`}
+            className={` break-words relative p-3 bg-white text-black rounded-lg shadow-md border border-white cursor-pointer ${isDragging ? "opacity-50" : ""} ${highPriorityClass}`}
         >
             {/* show the picture if user is assigned  */}
             {task.assignedTo?.picture && (
@@ -37,7 +37,10 @@ const KanbanBoardTask = ({task, onClick}) => {
                     className="absolute top-2 right-2 w-8 h-8 rounded-full object-cover border-2 border-red-600 shadow-sm"
                 />
             )}
+            <div className="break-words whitespace-pre-wrap pr-12">
+
             {task.text || task.name}
+        </div>
         </div>
     );
 };
@@ -54,16 +57,18 @@ const Column = ({name, tasks, moveTask, onTicketClick}) => {
     // TO;DO I NEED TO MAKE THIS USE THE KANBAN BOARD TASK COMPONENT
     return (
         // assigns drop functionality to the div
-        <div ref={drop} className="w-64 bg-accent p-4 rounded-lg shadow-md">
-            <h2 className="text-white font-bold text-lg mb-3">{name}</h2>
+        <div ref={drop} className="w-64 bg-accent p-4 rounded-lg shadow-md ">
+            <h2 className="text-white font-bold text-lg mb-3 break-words">{name}</h2>
             <div className="space-y-3">
                 {/* for some reason i have to check tasks is array idk man */}
                 {Array.isArray(tasks) ? (
                     tasks
                         .filter((task) => task.status === name)
                         .map((task) => (
-                            <KanbanBoardTask key={task.id} task={task} moveTask={moveTask}
-                                             onClick={() => onTicketClick(task)}/>
+                            <KanbanBoardTask
+                                key={task.id} task={task} moveTask={moveTask}
+                                             onClick={() => onTicketClick(task)}
+                            />
                         ))
                 ) : (
                     <p className="text-white">No tasks available</p>
@@ -185,7 +190,7 @@ const SprintKanbanModal = ({isOpen, onClose, sprint, user, workspace, onSetCurre
                 </button>
 
                 <div className="flex justify-between items-center m-4 mb-6">
-                    <h2 className="text-2xl font-bold text-white">
+                    <h2 className="text-2xl font-bold text-white break-words w-0 flex-1">
                         {sprint?.name} - Sprint Board
                     </h2>
                     <div className="flex justify-start">
